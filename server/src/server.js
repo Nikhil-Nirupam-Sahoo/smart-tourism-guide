@@ -38,7 +38,8 @@ app.use((_req, res) => {
 
 // Error handler
 app.use((err, _req, res, _next) => {
-  const statusCode = err.statusCode || 500;
+  // Respect statuses set with res.status(...) before throwing.
+  const statusCode = err.statusCode || (res.statusCode >= 400 ? res.statusCode : 500);
   res.status(statusCode).json({
     message: err.message || 'Internal Server Error',
     ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
