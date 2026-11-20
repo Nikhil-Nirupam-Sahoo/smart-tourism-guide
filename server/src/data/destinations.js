@@ -22,6 +22,7 @@ const internationalDestinations = [
     bestTimeToVisit: 'April to October',
     location: { type: 'Point', coordinates: [2.3522, 48.8566] },
     isFeatured: true,
+    isActive: true,
     bookingLinks: {
       flights: 'https://www.skyscanner.com/',
       hotels: 'https://www.booking.com/',
@@ -47,6 +48,7 @@ const internationalDestinations = [
     bestTimeToVisit: 'March to May, September to November',
     location: { type: 'Point', coordinates: [139.6917, 35.6895] },
     isFeatured: true,
+    isActive: true,
     bookingLinks: {
       flights: 'https://www.skyscanner.com/',
       hotels: 'https://www.booking.com/',
@@ -72,6 +74,7 @@ const internationalDestinations = [
     bestTimeToVisit: 'April to October',
     location: { type: 'Point', coordinates: [115.1889, -8.4095] },
     isFeatured: true,
+    isActive: true,
     bookingLinks: {
       flights: 'https://www.skyscanner.com/',
       hotels: 'https://www.booking.com/',
@@ -97,6 +100,7 @@ const internationalDestinations = [
     bestTimeToVisit: 'May to October',
     location: { type: 'Point', coordinates: [2.1734, 41.3851] },
     isFeatured: false,
+    isActive: true,
     bookingLinks: {
       flights: 'https://www.skyscanner.com/',
       hotels: 'https://www.booking.com/',
@@ -122,6 +126,7 @@ const internationalDestinations = [
     bestTimeToVisit: 'November to March',
     location: { type: 'Point', coordinates: [18.4241, -33.9249] },
     isFeatured: false,
+    isActive: true,
     bookingLinks: {
       flights: 'https://www.skyscanner.com/',
       hotels: 'https://www.booking.com/',
@@ -147,6 +152,7 @@ const internationalDestinations = [
     bestTimeToVisit: 'March to May, October to November',
     location: { type: 'Point', coordinates: [135.7681, 35.0116] },
     isFeatured: false,
+    isActive: true,
     bookingLinks: {
       flights: 'https://www.skyscanner.com/',
       hotels: 'https://www.booking.com/',
@@ -184,6 +190,7 @@ const indianDestinations = [
       ]
     },
     "isFeatured": true,
+    "isActive": true,
     "bookingLinks": {
       "flights": "https://www.skyscanner.com/",
       "hotels": "https://www.booking.com/",
@@ -218,6 +225,7 @@ const indianDestinations = [
       ]
     },
     "isFeatured": true,
+    "isActive": true,
     "bookingLinks": {
       "flights": "https://www.skyscanner.com/",
       "hotels": "https://www.booking.com/",
@@ -252,6 +260,7 @@ const indianDestinations = [
       ]
     },
     "isFeatured": true,
+    "isActive": true,
     "bookingLinks": {
       "flights": "https://www.skyscanner.com/",
       "hotels": "https://www.booking.com/",
@@ -286,6 +295,7 @@ const indianDestinations = [
       ]
     },
     "isFeatured": true,
+    "isActive": true,
     "bookingLinks": {
       "flights": "https://www.skyscanner.com/",
       "hotels": "https://www.booking.com/",
@@ -320,6 +330,7 @@ const indianDestinations = [
       ]
     },
     "isFeatured": false,
+    "isActive": true,
     "bookingLinks": {
       "flights": "https://www.skyscanner.com/",
       "hotels": "https://www.booking.com/",
@@ -354,6 +365,7 @@ const indianDestinations = [
       ]
     },
     "isFeatured": false,
+    "isActive": true,
     "bookingLinks": {
       "flights": "https://www.skyscanner.com/",
       "hotels": "https://www.booking.com/",
@@ -388,6 +400,7 @@ const indianDestinations = [
       ]
     },
     "isFeatured": false,
+    "isActive": true,
     "bookingLinks": {
       "flights": "https://www.skyscanner.com/",
       "hotels": "https://www.booking.com/",
@@ -422,6 +435,7 @@ const indianDestinations = [
       ]
     },
     "isFeatured": false,
+    "isActive": true,
     "bookingLinks": {
       "flights": "https://www.skyscanner.com/",
       "hotels": "https://www.booking.com/",
@@ -456,6 +470,7 @@ const indianDestinations = [
       ]
     },
     "isFeatured": true,
+    "isActive": true,
     "bookingLinks": {
       "flights": "https://www.skyscanner.com/",
       "hotels": "https://www.booking.com/",
@@ -490,6 +505,7 @@ const indianDestinations = [
       ]
     },
     "isFeatured": true,
+    "isActive": true,
     "bookingLinks": {
       "flights": "https://www.skyscanner.com/",
       "hotels": "https://www.booking.com/",
@@ -524,6 +540,7 @@ const indianDestinations = [
       ]
     },
     "isFeatured": false,
+    "isActive": true,
     "bookingLinks": {
       "flights": "https://www.skyscanner.com/",
       "hotels": "https://www.booking.com/",
@@ -558,6 +575,7 @@ const indianDestinations = [
       ]
     },
     "isFeatured": false,
+    "isActive": true,
     "bookingLinks": {
       "flights": "https://www.skyscanner.com/",
       "hotels": "https://www.booking.com/",
@@ -592,6 +610,7 @@ const indianDestinations = [
       ]
     },
     "isFeatured": true,
+    "isActive": true,
     "bookingLinks": {
       "flights": "https://www.skyscanner.com/",
       "hotels": "https://www.booking.com/",
@@ -626,6 +645,7 @@ const indianDestinations = [
       ]
     },
     "isFeatured": false,
+    "isActive": true,
     "bookingLinks": {
       "flights": "https://www.skyscanner.com/",
       "hotels": "https://www.booking.com/",
@@ -660,6 +680,7 @@ const indianDestinations = [
       ]
     },
     "isFeatured": false,
+    "isActive": true,
     "bookingLinks": {
       "flights": "https://www.skyscanner.com/",
       "hotels": "https://www.booking.com/",
@@ -694,6 +715,7 @@ const indianDestinations = [
       ]
     },
     "isFeatured": true,
+    "isActive": true,
     "bookingLinks": {
       "flights": "https://www.skyscanner.com/",
       "hotels": "https://www.booking.com/",
@@ -728,6 +750,7 @@ const indianDestinations = [
       ]
     },
     "isFeatured": true,
+    "isActive": true,
     "bookingLinks": {
       "flights": "https://www.skyscanner.com/",
       "hotels": "https://www.booking.com/",
@@ -762,6 +785,7 @@ const indianDestinations = [
       ]
     },
     "isFeatured": false,
+    "isActive": true,
     "bookingLinks": {
       "flights": "https://www.skyscanner.com/",
       "hotels": "https://www.booking.com/",
@@ -796,6 +820,7 @@ const indianDestinations = [
       ]
     },
     "isFeatured": false,
+    "isActive": true,
     "bookingLinks": {
       "flights": "https://www.skyscanner.com/",
       "hotels": "https://www.booking.com/",
@@ -830,6 +855,7 @@ const indianDestinations = [
       ]
     },
     "isFeatured": false,
+    "isActive": true,
     "bookingLinks": {
       "flights": "https://www.skyscanner.com/",
       "hotels": "https://www.booking.com/",
@@ -864,6 +890,7 @@ const indianDestinations = [
       ]
     },
     "isFeatured": false,
+    "isActive": true,
     "bookingLinks": {
       "flights": "https://www.skyscanner.com/",
       "hotels": "https://www.booking.com/",
@@ -898,6 +925,7 @@ const indianDestinations = [
       ]
     },
     "isFeatured": false,
+    "isActive": true,
     "bookingLinks": {
       "flights": "https://www.skyscanner.com/",
       "hotels": "https://www.booking.com/",
@@ -932,6 +960,7 @@ const indianDestinations = [
       ]
     },
     "isFeatured": true,
+    "isActive": true,
     "bookingLinks": {
       "flights": "https://www.skyscanner.com/",
       "hotels": "https://www.booking.com/",
@@ -966,6 +995,7 @@ const indianDestinations = [
       ]
     },
     "isFeatured": false,
+    "isActive": true,
     "bookingLinks": {
       "flights": "https://www.skyscanner.com/",
       "hotels": "https://www.booking.com/",
@@ -1000,6 +1030,7 @@ const indianDestinations = [
       ]
     },
     "isFeatured": false,
+    "isActive": true,
     "bookingLinks": {
       "flights": "https://www.skyscanner.com/",
       "hotels": "https://www.booking.com/",
@@ -1034,6 +1065,7 @@ const indianDestinations = [
       ]
     },
     "isFeatured": true,
+    "isActive": true,
     "bookingLinks": {
       "flights": "https://www.skyscanner.com/",
       "hotels": "https://www.booking.com/",
@@ -1068,6 +1100,7 @@ const indianDestinations = [
       ]
     },
     "isFeatured": false,
+    "isActive": true,
     "bookingLinks": {
       "flights": "https://www.skyscanner.com/",
       "hotels": "https://www.booking.com/",
@@ -1102,6 +1135,7 @@ const indianDestinations = [
       ]
     },
     "isFeatured": false,
+    "isActive": true,
     "bookingLinks": {
       "flights": "https://www.skyscanner.com/",
       "hotels": "https://www.booking.com/",
@@ -1136,6 +1170,7 @@ const indianDestinations = [
       ]
     },
     "isFeatured": false,
+    "isActive": true,
     "bookingLinks": {
       "flights": "https://www.skyscanner.com/",
       "hotels": "https://www.booking.com/",
@@ -1169,6 +1204,7 @@ const indianDestinations = [
       ]
     },
     "isFeatured": false,
+    "isActive": true,
     "bookingLinks": {
       "flights": "https://www.skyscanner.com/",
       "hotels": "https://www.booking.com/",
@@ -1202,6 +1238,7 @@ const indianDestinations = [
       ]
     },
     "isFeatured": false,
+    "isActive": true,
     "bookingLinks": {
       "flights": "https://www.skyscanner.com/",
       "hotels": "https://www.booking.com/",
@@ -1236,6 +1273,7 @@ const indianDestinations = [
       ]
     },
     "isFeatured": false,
+    "isActive": true,
     "bookingLinks": {
       "flights": "https://www.skyscanner.com/",
       "hotels": "https://www.booking.com/",
@@ -1270,6 +1308,7 @@ const indianDestinations = [
       ]
     },
     "isFeatured": false,
+    "isActive": true,
     "bookingLinks": {
       "flights": "https://www.skyscanner.com/",
       "hotels": "https://www.booking.com/",
@@ -1304,6 +1343,7 @@ const indianDestinations = [
       ]
     },
     "isFeatured": true,
+    "isActive": true,
     "bookingLinks": {
       "flights": "https://www.skyscanner.com/",
       "hotels": "https://www.booking.com/",
@@ -1338,6 +1378,7 @@ const indianDestinations = [
       ]
     },
     "isFeatured": false,
+    "isActive": true,
     "bookingLinks": {
       "flights": "https://www.skyscanner.com/",
       "hotels": "https://www.booking.com/",
@@ -1372,6 +1413,7 @@ const indianDestinations = [
       ]
     },
     "isFeatured": false,
+    "isActive": true,
     "bookingLinks": {
       "flights": "https://www.skyscanner.com/",
       "hotels": "https://www.booking.com/",
@@ -1406,6 +1448,7 @@ const indianDestinations = [
       ]
     },
     "isFeatured": false,
+    "isActive": true,
     "bookingLinks": {
       "flights": "https://www.skyscanner.com/",
       "hotels": "https://www.booking.com/",
@@ -1440,6 +1483,7 @@ const indianDestinations = [
       ]
     },
     "isFeatured": false,
+    "isActive": true,
     "bookingLinks": {
       "flights": "https://www.skyscanner.com/",
       "hotels": "https://www.booking.com/",
@@ -1474,6 +1518,7 @@ const indianDestinations = [
       ]
     },
     "isFeatured": false,
+    "isActive": true,
     "bookingLinks": {
       "flights": "https://www.skyscanner.com/",
       "hotels": "https://www.booking.com/",
@@ -1508,6 +1553,7 @@ const indianDestinations = [
       ]
     },
     "isFeatured": false,
+    "isActive": true,
     "bookingLinks": {
       "flights": "https://www.skyscanner.com/",
       "hotels": "https://www.booking.com/",
@@ -1542,6 +1588,7 @@ const indianDestinations = [
       ]
     },
     "isFeatured": false,
+    "isActive": true,
     "bookingLinks": {
       "flights": "https://www.skyscanner.com/",
       "hotels": "https://www.booking.com/",
@@ -1576,6 +1623,7 @@ const indianDestinations = [
       ]
     },
     "isFeatured": false,
+    "isActive": true,
     "bookingLinks": {
       "flights": "https://www.skyscanner.com/",
       "hotels": "https://www.booking.com/",
@@ -1610,6 +1658,7 @@ const indianDestinations = [
       ]
     },
     "isFeatured": false,
+    "isActive": true,
     "bookingLinks": {
       "flights": "https://www.skyscanner.com/",
       "hotels": "https://www.booking.com/",
@@ -1644,6 +1693,7 @@ const indianDestinations = [
       ]
     },
     "isFeatured": false,
+    "isActive": true,
     "bookingLinks": {
       "flights": "https://www.skyscanner.com/",
       "hotels": "https://www.booking.com/",
@@ -1678,6 +1728,7 @@ const indianDestinations = [
       ]
     },
     "isFeatured": false,
+    "isActive": true,
     "bookingLinks": {
       "flights": "https://www.skyscanner.com/",
       "hotels": "https://www.booking.com/",
@@ -1712,6 +1763,7 @@ const indianDestinations = [
       ]
     },
     "isFeatured": false,
+    "isActive": true,
     "bookingLinks": {
       "flights": "https://www.skyscanner.com/",
       "hotels": "https://www.booking.com/",
@@ -1746,6 +1798,7 @@ const indianDestinations = [
       ]
     },
     "isFeatured": false,
+    "isActive": true,
     "bookingLinks": {
       "flights": "https://www.skyscanner.com/",
       "hotels": "https://www.booking.com/",

@@ -20,7 +20,13 @@ app.use(express.json({ limit: '10mb' }));
 
 // Health check
 app.get('/api/health', (_req, res) => {
-  res.json({ status: 'ok', service: 'smart-tourism-server', time: new Date().toISOString() });
+  res.json({
+    status: 'ok',
+    service: 'smart-tourism-server',
+    version: '2026-11-20-india',
+    destinations: seedDestinations.length,
+    time: new Date().toISOString(),
+  });
 });
 
 // ---------- API Routes ----------
@@ -72,8 +78,9 @@ async function connectAndSeed() {
     } else {
       // Upsert every seed destination: insert new ones (e.g. new Indian cities)
       // and refresh images/booking links on existing ones.
-      await Promise.all(
-        seedDestinations.map(async (d) => {
+      const failures = [];
+      for (const d of seedDestinations) {
+        try {
           await Destination.updateOne({ name: d.name }, { $setOnInsert: d }, { upsert: true });
           await Destination.updateOne(
             { name: d.name },
@@ -90,8 +97,11 @@ async function connectAndSeed() {
               },
             }
           );
-        })
-      );
+        } catch (seedErr) {
+          failures.push(`${d.name}: ${seedErr.message}`);
+        }
+      }
+      if (failures.length) console.warn('⚠️  Seed warnings:', failures.slice(0, 5).join(' | '));
       const updatedCount = await Destination.countDocuments();
       console.log(`📊 ${count} → ${updatedCount} destinations in database (seed upsert complete)`);
     }
