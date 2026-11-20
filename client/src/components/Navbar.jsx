@@ -30,9 +30,7 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-sky-500 to-cyan-400 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-sky-200">
-              <Compass size={20} />
-            </div>
+            <img src="/logo.svg" alt="SmartGuide logo" className="w-9 h-9 rounded-xl shadow-lg shadow-sky-200/60" />
             <span className="font-bold text-xl tracking-tight text-slate-900">Smart<span className="text-sky-500">Guide</span></span>
           </Link>
 

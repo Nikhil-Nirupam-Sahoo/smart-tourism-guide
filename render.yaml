@@ -21,6 +21,9 @@ services:
         value: 7d
       - key: MONGO_URI
         sync: false   # set this manually to your MongoDB Atlas URI
+      # For real AI: set AI_PROVIDER=groq and add GROQ_API_KEY (free at console.groq.com).
+      # Alternatives: gemini + GEMINI_API_KEY, openrouter + OPENROUTER_API_KEY, openai + OPENAI_API_KEY.
+      # Optional AI_MODEL overrides the provider's default model.
       - key: AI_PROVIDER
         value: mock
       - key: CLIENT_URL

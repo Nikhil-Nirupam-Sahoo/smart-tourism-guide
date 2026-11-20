@@ -21,12 +21,16 @@ const chat = asyncHandler(async (req, res) => {
   }));
   messages.push({ role: 'user', content: message });
 
-  const reply = await chatCompletion(messages, {
+  const result = await chatCompletion(messages, {
     temperature: 0.7,
     maxTokens: 1000,
   });
 
-  res.json({ reply });
+  res.json({
+    reply: result.content,
+    source: result.source,
+    model: result.model,
+  });
 });
 
 module.exports = { chat };

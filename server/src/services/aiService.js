@@ -1,52 +1,174 @@
 /**
  * AI Service for Smart Tourism Guide
- * Supports "openai" (real LLM) or "mock" (fallback, no API key).
- * Set AI_PROVIDER=openai and OPENAI_API_KEY in .env to use real GPT.
+ *
+ * Providers (set AI_PROVIDER):
+ *   groq       - free, very fast. Needs GROQ_API_KEY (or OPENAI_API_KEY).
+ *   gemini     - free tier. Needs GEMINI_API_KEY (or GOOGLE_API_KEY).
+ *   openrouter - one key for many models. Needs OPENROUTER_API_KEY.
+ *   openai     - needs OPENAI_API_KEY.
+ *   mock       - built-in demo responses, no key required (default).
+ *
+ * Optional: AI_MODEL overrides the provider's default model.
+ * AI_PROVIDER=openai with OPENAI_BASE_URL also works with any OpenAI-compatible API.
  */
 
 const { OpenAI } = require('openai');
 
-const PROVIDER = process.env.AI_PROVIDER || 'mock';
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY || '';
-const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-3.5-turbo';
-const OPENAI_BASE_URL = process.env.OPENAI_BASE_URL || undefined;
-
-let openai = null;
-if (PROVIDER === 'openai' && OPENAI_API_KEY) {
-  openai = new OpenAI({ apiKey: OPENAI_API_KEY, baseURL: OPENAI_BASE_URL });
-}
+const PROVIDER = (process.env.AI_PROVIDER || 'mock').trim().toLowerCase();
 
 const SYSTEM_PROMPT = `You are SmartGuide, an expert AI travel assistant.
 Help users plan trips, discover destinations, and get local travel tips.
 Be friendly, concise, practical. For itineraries include morning/afternoon/evening, durations, estimated costs, food, tips.
-Format with day headings and bullet points. Decline unsafe/illegal requests politely.`;
+When asked for an itinerary, use exactly this structure for each day:
+**Day 1**
+• Morning: <activity>
+• Afternoon: <activity>
+• Evening: <activity>
+• Meal: <suggestion>
+• Est. cost: <estimate>
+Format day headers with ** bold markers ** and bullet points with •. Decline unsafe/illegal requests politely.`;
 
-/**
- * Generate a chat completion.
- */
-async function chatCompletion(messages, options = {}) {
-  const { temperature = 0.7, maxTokens = 1000 } = options;
+const PROVIDERS = {
+  groq: {
+    label: 'Groq',
+    key: process.env.GROQ_API_KEY || process.env.OPENAI_API_KEY || '',
+    model: process.env.AI_MODEL || process.env.OPENAI_MODEL || 'openai/gpt-oss-120b',
+    baseURL: process.env.OPENAI_BASE_URL || 'https://api.groq.com/openai/v1',
+    kind: 'openai-compatible',
+  },
+  openrouter: {
+    label: 'OpenRouter',
+    key: process.env.OPENROUTER_API_KEY || process.env.OPENAI_API_KEY || '',
+    model: process.env.AI_MODEL || process.env.OPENAI_MODEL || 'meta-llama/llama-3.3-70b-instruct:free',
+    baseURL: process.env.OPENAI_BASE_URL || 'https://openrouter.ai/api/v1',
+    kind: 'openai-compatible',
+  },
+  openai: {
+    label: 'OpenAI',
+    key: process.env.OPENAI_API_KEY || '',
+    model: process.env.AI_MODEL || process.env.OPENAI_MODEL || 'gpt-4o-mini',
+    baseURL: process.env.OPENAI_BASE_URL || undefined,
+    kind: 'openai-compatible',
+  },
+  gemini: {
+    label: 'Gemini',
+    key: process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '',
+    model: process.env.AI_MODEL || 'gemini-2.5-flash',
+    kind: 'gemini',
+  },
+};
 
-  if (PROVIDER === 'openai' && openai) {
-    try {
-      const completion = await openai.chat.completions.create({
-        model: OPENAI_MODEL,
-        messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...messages],
-        temperature,
-        max_tokens: maxTokens,
-      });
-      return completion.choices[0].message.content;
-    } catch (err) {
-      console.error('OpenAI error:', err.message);
-      return mockCompletion(messages);
-    }
+const clientCache = new Map();
+
+function configuredProvider() {
+  if (PROVIDER === 'mock' || PROVIDER === 'none') return null;
+  if (PROVIDERS[PROVIDER]) return PROVIDERS[PROVIDER];
+
+  // Backwards compatibility: if an unknown provider is set but a key exists,
+  // treat it as an OpenAI-compatible endpoint.
+  const key = process.env.OPENAI_API_KEY || process.env.AI_API_KEY || '';
+  return {
+    label: PROVIDER,
+    key,
+    model: process.env.AI_MODEL || process.env.OPENAI_MODEL || 'gpt-4o-mini',
+    baseURL: process.env.OPENAI_BASE_URL || undefined,
+    kind: 'openai-compatible',
+  };
+}
+
+async function openAICompatibleCompletion(messages, options, cfg) {
+  if (!cfg.key) {
+    const err = new Error(`No API key found for ${cfg.label}. Set the key in Render environment variables.`);
+    err.statusCode = 503;
+    throw err;
   }
-  return mockCompletion(messages);
+
+  let client = clientCache.get(cfg.label);
+  if (!client) {
+    client = new OpenAI({ apiKey: cfg.key, baseURL: cfg.baseURL });
+    clientCache.set(cfg.label, client);
+  }
+
+  const completion = await client.chat.completions.create({
+    model: cfg.model,
+    messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...messages],
+    temperature: options.temperature,
+    max_tokens: options.maxTokens,
+  });
+
+  const content = completion.choices?.[0]?.message?.content || '';
+  return { content, source: cfg.label, model: cfg.model };
+}
+
+async function geminiCompletion(messages, options, cfg) {
+  if (!cfg.key) {
+    const err = new Error('No Gemini API key found. Set GEMINI_API_KEY in Render environment variables.');
+    err.statusCode = 503;
+    throw err;
+  }
+
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(
+    cfg.model
+  )}:generateContent?key=${encodeURIComponent(cfg.key)}`;
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+      contents: messages.map((m) => ({
+        role: m.role === 'assistant' ? 'model' : 'user',
+        parts: [{ text: String(m.content || '') }],
+      })),
+      generationConfig: {
+        temperature: options.temperature,
+        maxOutputTokens: options.maxTokens,
+      },
+    }),
+  });
+
+  const data = await response.json().catch(() => null);
+  if (!response.ok) {
+    throw new Error(data?.error?.message || `Gemini request failed with HTTP ${response.status}`);
+  }
+
+  const content =
+    data?.candidates?.[0]?.content?.parts?.map((part) => part.text || '').join('') || '';
+  return { content, source: cfg.label, model: cfg.model };
 }
 
 /**
- * Mock AI fallback (no API key required).
+ * Generate a chat completion. Returns { content, source, model }.
+ * Real provider failures are surfaced instead of silently using the demo AI.
  */
+async function chatCompletion(messages, options = {}) {
+  const settings = {
+    temperature: options.temperature ?? 0.7,
+    maxTokens: options.maxTokens ?? 1000,
+  };
+
+  const cfg = configuredProvider();
+  if (cfg) {
+    try {
+      return cfg.kind === 'gemini'
+        ? await geminiCompletion(messages, settings, cfg)
+        : await openAICompatibleCompletion(messages, settings, cfg);
+    } catch (err) {
+      console.error(`${cfg.label} error:`, err.message);
+      if (err.statusCode) throw err;
+      const wrapped = new Error(`${cfg.label} request failed: ${err.message}`);
+      wrapped.statusCode = 502;
+      throw wrapped;
+    }
+  }
+
+  return { content: mockCompletion(messages), source: 'mock', model: 'built-in' };
+}
+
+/* ------------------------------------------------------------------ */
+/* Demo/mock AI — used only when AI_PROVIDER=mock (the default).        */
+/* ------------------------------------------------------------------ */
+
 const activityPool = {
   morning: [
     'Explore the historic old town on foot',
@@ -91,7 +213,7 @@ function mockCompletion(messages) {
   }
 
   if (lower.includes('recommend') || lower.includes('suggest') || lower.includes('where should') || lower.includes('best place')) {
-    return generateMockRecommendations(lower);
+    return generateMockRecommendations();
   }
 
   if (lower.includes('pack') || lower.includes('packing')) {
@@ -104,9 +226,9 @@ function mockCompletion(messages) {
 
   if (lower.includes('hi') || lower.includes('hello') || lower.includes('hey')) {
     const greetings = [
-      'Hello! I\'m SmartGuide ✈️ — your AI travel assistant.',
+      "Hello! I'm SmartGuide ✈️ — your AI travel assistant.",
       'Hi there! Ready to plan your next adventure?',
-      'Greetings! I\'m here to help you design the perfect trip.',
+      "Greetings! I'm here to help you design the perfect trip.",
     ];
     return `${randomPick(greetings)}\n\nI can help you with:\n• Custom day-by-day itineraries\n• Destination recommendations\n• Packing and budgeting advice\n• Local tips and hidden gems\n\nWhere would you like to go?`;
   }
@@ -115,7 +237,14 @@ function mockCompletion(messages) {
 }
 
 function extractDestination(text) {
-  const known = ['paris','tokyo','new york','london','bali','rome','bangkok','barcelona','sydney','dubai','istanbul','marrakech','kyoto','santorini','cape town','rio de janeiro','vancouver','berlin','amsterdam','prague','dubai','cairo','moscow','delhi','bangkok','seoul','singapore','hong kong','istanbul','moscow','rome','athens','lisbon','madrid','milan','venice','florence','vienna','budapest','stockholm','oslo','copenhagen','helsinki','reykjavik','dublin','edinburgh','brussels','zurich','geneva','bratislava','ljubljana','zagreb','sarajevo','skopje','sofia','bucharest','kyiv','minsk','riga','vilnius','tallinn','warsaw','prague','bratislava','ljubljana','zagreb'];
+  const known = [
+    'agra', 'jaipur', 'delhi', 'mumbai', 'varanasi', 'goa', 'munnar', 'udaipur',
+    'rishikesh', 'shimla', 'manali', 'kochi', 'hampi', 'mysore', 'amritsar',
+    'srinagar', 'leh', 'gangtok', 'darjeeling', 'paris', 'tokyo', 'new york',
+    'london', 'bali', 'rome', 'bangkok', 'barcelona', 'sydney', 'dubai',
+    'istanbul', 'marrakech', 'kyoto', 'santorini', 'cape town', 'vancouver',
+    'berlin', 'amsterdam', 'prague', 'cairo', 'seoul', 'singapore', 'lisbon',
+  ];
   const lower = text.toLowerCase();
   for (const city of known) if (lower.includes(city)) return city;
   return null;
@@ -125,41 +254,38 @@ function generateMockItinerary(destination, days) {
   let result = `🗓️ ${days}-Day Itinerary for ${destination}\n\n`;
   result += `Here's a personalized plan for your trip to ${destination}. Adjust based on your pace and interests.\n\n`;
   for (let d = 1; d <= days; d++) {
-    const m = randomPick(activityPool.morning);
-    const a = randomPick(activityPool.afternoon);
-    const e = randomPick(activityPool.evening);
     const costs = ['Budget ($)', 'Mid-range ($$)', 'Luxury ($$$)'];
-    const cost = costs[Math.floor(Math.random() * costs.length)];
     result += `**Day ${d}**\n`;
-    result += `• Morning: ${m}\n`;
-    result += `• Afternoon: ${a}\n`;
-    result += `• Evening: ${e}\n`;
+    result += `• Morning: ${randomPick(activityPool.morning)}\n`;
+    result += `• Afternoon: ${randomPick(activityPool.afternoon)}\n`;
+    result += `• Evening: ${randomPick(activityPool.evening)}\n`;
     result += `• Meal: Try a local specialty dish\n`;
-    result += `• Est. cost: ${cost}\n\n`;
+    result += `• Est. cost: ${randomPick(costs)}\n\n`;
   }
   result += `💡 Tips for ${destination}:\n• Start early to beat crowds at top sights\n• Book popular attractions in advance\n• Keep digital and paper copies of reservations\n• Ask locals for their favorite spots\n\nEnjoy your trip to ${destination}!`;
   return result;
 }
 
-function generateMockRecommendations(lower) {
+function generateMockRecommendations() {
   const recs = [
-    { name: 'Kyoto, Japan', why: 'Temples, cherry blossoms, tea houses — perfect for culture lovers.', budget: 'Mid-range' },
-    { name: 'Bali, Indonesia', why: 'Tropical beaches, rice terraces, wellness retreats — ideal for relaxation.', budget: 'Budget' },
-    { name: 'Barcelona, Spain', why: 'Gaudí architecture, tapas, vibrant Mediterranean lifestyle.', budget: 'Mid-range' },
-    { name: 'Queenstown, New Zealand', why: 'Adventure capital — bungee, skiing, breathtaking alpine scenery.', budget: 'Luxury' },
-    { name: 'Marrakech, Morocco', why: 'Colorful souks, historic palaces, aromatic Moroccan cuisine.', budget: 'Budget' },
-    { name: 'Reykjavik, Iceland', why: 'Northern lights, geothermal pools, dramatic volcanic landscapes.', budget: 'Luxury' },
-    { name: 'Amsterdam, Netherlands', why: 'Canals, museums, cycling culture, and cozy cafés.', budget: 'Mid-range' },
-    { name: 'Cape Town, South Africa', why: 'Table Mountain, beaches, vineyards, and wildlife.', budget: 'Budget' },
+    { name: 'Agra, India', why: 'The Taj Mahal, Mughal history, and great food.', budget: 'Mid-range' },
+    { name: 'Varanasi, India', why: 'Spiritual ghats, evening aarti, and timeless old lanes.', budget: 'Budget' },
+    { name: 'Goa, India', why: 'Beaches, Portuguese heritage, and relaxed vibes.', budget: 'Mid-range' },
+    { name: 'Munnar, India', why: 'Tea plantations, cool hills, and nature trails.', budget: 'Mid-range' },
+    { name: 'Jaipur, India', why: 'Palaces, forts, and colorful bazaars.', budget: 'Budget' },
+    { name: 'Rishikesh, India', why: 'Yoga, river rafting, and Himalayan views.', budget: 'Budget' },
+    { name: 'Kyoto, Japan', why: 'Temples, cherry blossoms, tea houses.', budget: 'Mid-range' },
+    { name: 'Bali, Indonesia', why: 'Tropical beaches, rice terraces, wellness retreats.', budget: 'Budget' },
+    { name: 'Barcelona, Spain', why: 'Gaudí architecture, tapas, Mediterranean lifestyle.', budget: 'Mid-range' },
+    { name: 'Marrakech, Morocco', why: 'Colorful souks, palaces, and Moroccan cuisine.', budget: 'Budget' },
   ];
   let result = '🌍 Destination Recommendations\n\n';
-  // Shuffle for variety
   const shuffled = [...recs].sort(() => Math.random() - 0.5);
-  for (const r of shuffled) {
+  for (const r of shuffled.slice(0, 6)) {
     result += `• ${r.name} (${r.budget})\n  ${r.why}\n\n`;
   }
   result += 'Tell me your interests and travel dates, and I can narrow this down further!';
   return result;
 }
 
-module.exports = { chatCompletion, SYSTEM_PROMPT };
+module.exports = { chatCompletion, SYSTEM_PROMPT, configuredProvider };

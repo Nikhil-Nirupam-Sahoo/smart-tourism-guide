@@ -69,7 +69,7 @@ const createTrip = asyncHandler(async (req, res) => {
       }],
       { temperature: 0.7, maxTokens: 1500 }
     );
-    itinerary = parseAiItinerary(aiResponse, durationDays);
+    itinerary = parseAiItinerary(aiResponse.content, durationDays);
   }
 
   const trip = await dbCreateTrip({
@@ -130,7 +130,10 @@ const deleteTrip = asyncHandler(async (req, res) => {
 
 function parseAiItinerary(text, days) {
   const plan = [];
-  const dayBlocks = text.split(/(?=\*\*Day\s*\d+\*\*)/i).filter((b) => /\*\*Day\s*\d+\*\*/i.test(b));
+  // Accept **Day 1**, ### Day 1, or Day 1: headers from real LLM providers.
+  const dayBlocks = text
+    .split(/(?=(?:\*\*|#{1,4}\s*)?Day\s*\d+\b)/i)
+    .filter((b) => /(?:^|\n)\s*(?:\*\*|#{1,4}\s*)?Day\s*\d+\b/i.test(b));
   for (let i = 0; i < days && i < dayBlocks.length; i++) {
     const block = dayBlocks[i];
     const extract = (label) => {

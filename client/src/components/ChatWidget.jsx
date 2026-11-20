@@ -1,57 +1,134 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
-  MessageCircle,
   Send,
   Loader2,
-  Sun,
-  Moon,
-  MapPin,
-  Sparkles,
+  X,
+  ArrowDown,
+  RotateCcw,
 } from 'lucide-react';
 import { aiAPI } from '../services/api';
 
-export default function ChatWidget({ open = true }) {
+const GREETING =
+  "Hi! I'm SmartGuide ✈️ Ask me about destinations, itineraries, packing, or local tips.";
+
+function InlineText({ text }) {
+  return text.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
+    part.startsWith('**') && part.endsWith('**') ? (
+      <strong key={i} className="font-semibold">{part.slice(2, -2)}</strong>
+    ) : (
+      <React.Fragment key={i}>{part}</React.Fragment>
+    )
+  );
+}
+
+/** Lightweight markdown: bold headings, bullet lines, and paragraphs. */
+function MessageBody({ content }) {
+  return (
+    <div className="space-y-1">
+      {String(content || '').split('\n').map((line, i) => {
+        const trimmed = line.trim();
+        if (!trimmed) return <div key={i} className="h-2" />;
+        if (/^\*\*[^*]+\*\*$/.test(trimmed)) {
+          return (
+            <div key={i} className="pt-1 text-[13px] font-semibold">
+              <InlineText text={trimmed} />
+            </div>
+          );
+        }
+        if (/^[-•*]\s+/.test(trimmed)) {
+          return (
+            <div key={i} className="flex gap-2">
+              <span className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-current opacity-60" />
+              <span><InlineText text={trimmed.replace(/^[-•*]\s+/, '')} /></span>
+            </div>
+          );
+        }
+        return (
+          <div key={i}>
+            <InlineText text={line} />
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+export default function ChatWidget({ open = false }) {
   const [isOpen, setIsOpen] = useState(open);
   const [messages, setMessages] = useState([
-    {
-      role: 'assistant',
-      content:
-        "Hi! I'm SmartGuide ✈️ Ask me about destinations, itineraries, packing, or local tips.",
-    },
+    { id: 1, role: 'assistant', content: GREETING },
   ]);
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
-  const messagesEndRef = useRef(null);
+  const [atBottom, setAtBottom] = useState(true);
+  const [aiInfo, setAiInfo] = useState(null);
+
+  const scrollRef = useRef(null);
+  const inputRef = useRef(null);
+  const atBottomRef = useRef(true);
+  const nextId = useRef(2);
+
+  const scrollToBottom = useCallback((behavior = 'smooth') => {
+    const el = scrollRef.current;
+    if (el) el.scrollTo({ top: el.scrollHeight, behavior });
+  }, []);
+
+  // Only auto-scroll when the user is already near the bottom, so reading
+  // older messages isn't interrupted by a new reply.
+  useEffect(() => {
+    if (atBottomRef.current) scrollToBottom();
+  }, [messages.length, sending, scrollToBottom]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    if (isOpen) {
+      const timer = setTimeout(() => inputRef.current?.focus(), 80);
+      scrollToBottom('auto');
+      return () => clearTimeout(timer);
+    }
+    return undefined;
+  }, [isOpen, scrollToBottom]);
 
-  const handleSend = async (e) => {
-    e.preventDefault();
-    if (!input.trim() || sending) return;
+  const handleScroll = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const near = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
+    atBottomRef.current = near;
+    setAtBottom(near);
+  };
 
-    const userMessage = input;
+  const handleSend = async (event) => {
+    event?.preventDefault();
+    const text = input.trim();
+    if (!text || sending) return;
+
+    const history = messages.slice(-8).map(({ role, content }) => ({ role, content }));
     setInput('');
+    atBottomRef.current = true;
+    setMessages((prev) => [...prev, { id: nextId.current++, role: 'user', content: text }]);
     setSending(true);
-    setMessages((prev) => [...prev, { role: 'user', content: userMessage }]);
 
     try {
-      const res = await aiAPI.chat({
-        message: userMessage,
-        history: messages,
-      });
-      setMessages((prev) => [
-        ...prev,
-        { role: 'assistant', content: res.data.reply },
-      ]);
-    } catch (err) {
+      const res = await aiAPI.chat({ message: text, history });
+      setAiInfo({ source: res.data?.source, model: res.data?.model });
       setMessages((prev) => [
         ...prev,
         {
+          id: nextId.current++,
           role: 'assistant',
-          content:
-            "Sorry, I'm having trouble connecting. Make sure the backend is running.",
+          content: res.data?.reply || 'Sorry, I did not get a reply. Please try again.',
+        },
+      ]);
+    } catch (err) {
+      const status = err.response?.status;
+      const detail = err.response?.data?.message;
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: nextId.current++,
+          role: 'assistant',
+          content: `Sorry — I couldn't reach the AI service${status ? ` (HTTP ${status})` : ''}. ${
+            detail || 'Please check your connection and try again.'
+          }`,
         },
       ]);
     } finally {
@@ -59,92 +136,144 @@ export default function ChatWidget({ open = true }) {
     }
   };
 
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      handleSend();
+    }
+  };
+
+  const clearChat = () => {
+    setMessages([
+      { id: nextId.current++, role: 'assistant', content: 'Fresh chat! Where would you like to go?' },
+    ]);
+    setAiInfo(null);
+    atBottomRef.current = true;
+    inputRef.current?.focus();
+  };
+
   if (!isOpen) {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 bg-sky-600 text-white p-3 rounded-2xl shadow-xl hover:bg-sky-700 transition-all transform hover:scale-105 z-50"
-        aria-label="Open chat"
+        className="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-2xl bg-sky-600 px-4 py-3 text-sm font-semibold text-white shadow-xl transition-all hover:scale-105 hover:bg-sky-700"
+        aria-label="Open AI chat"
       >
-        <MessageCircle size={20} />
+        <img src="/logo.svg" alt="" className="h-6 w-6 rounded-md" />
+        <span className="hidden sm:inline">Ask SmartGuide</span>
       </button>
     );
   }
 
+  const providerLabel =
+    aiInfo?.source && aiInfo.source !== 'mock'
+      ? aiInfo.source.toUpperCase()
+      : 'DEMO AI';
+
   return (
-    <div className="fixed bottom-6 right-6 w-96 flex flex-col shadow-2xl rounded-2xl bg-white border border-slate-200 z-50 animate-slide-up">
+    <div className="fixed bottom-4 right-4 z-50 flex h-[70vh] max-h-[600px] w-[calc(100vw-2rem)] max-w-[380px] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-900 sm:bottom-6 sm:right-6">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 bg-gradient-to-r from-sky-700 to-cyan-600 text-white rounded-t-2xl">
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-full bg-white flex items-center justify-center text-sky-600">
-            <MessageCircle size={14} />
-          </div>
+      <div className="flex items-center justify-between bg-gradient-to-r from-sky-700 to-cyan-600 px-4 py-3 text-white">
+        <div className="flex items-center gap-2.5">
+          <img src="/logo.svg" alt="" className="h-8 w-8 rounded-lg shadow-sm" />
           <div>
-            <h3 className="font-bold text-sm">SmartGuide</h3>
-            <p className="text-xs opacity-90">AI travel assistant</p>
+            <div className="flex items-center gap-2">
+              <h3 className="text-sm font-bold leading-tight">SmartGuide</h3>
+              <span
+                className="rounded-full bg-white/20 px-1.5 py-0.5 text-[9px] font-bold tracking-wide"
+                title={aiInfo?.model ? `Model: ${aiInfo.model}` : 'Built-in demo responses'}
+              >
+                {providerLabel}
+              </span>
+            </div>
+            <p className="text-[11px] opacity-90">AI travel assistant</p>
           </div>
         </div>
-        <button
-          onClick={() => setIsOpen(false)}
-          className="text-white hover:text-white/80"
-          aria-label="Close chat"
-        >
-          ✕
-        </button>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={clearChat}
+            className="rounded-lg p-1.5 text-white/90 transition hover:bg-white/20 hover:text-white"
+            aria-label="Clear chat"
+            title="Clear chat"
+          >
+            <RotateCcw size={15} />
+          </button>
+          <button
+            onClick={() => setIsOpen(false)}
+            className="rounded-lg p-1.5 text-white/90 transition hover:bg-white/20 hover:text-white"
+            aria-label="Close chat"
+          >
+            <X size={17} />
+          </button>
+        </div>
       </div>
 
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50">
-        {messages.map((msg, i) => (
+      {/* Messages — fixed-height flex child with its own scrollbar */}
+      <div
+        ref={scrollRef}
+        onScroll={handleScroll}
+        aria-live="polite"
+        className="relative min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain bg-slate-50 p-4 text-sm leading-relaxed dark:bg-slate-950"
+      >
+        {messages.map((msg) => (
           <div
-            key={i}
-            className={`max-w-[85%] p-3 rounded-2xl ${
+            key={msg.id}
+            className={`max-w-[88%] break-words rounded-2xl px-3.5 py-2.5 shadow-sm ${
               msg.role === 'user'
-                ? 'ml-auto bg-sky-600 text-white'
-                : 'mr-auto bg-white border border-slate-100 text-slate-800'
-            } shadow-sm`}
+                ? 'ml-auto rounded-br-md bg-sky-600 text-white'
+                : 'mr-auto rounded-bl-md border border-slate-200 bg-white text-slate-800 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100'
+            }`}
           >
-            {msg.role === 'assistant' && (
-              <div className="flex items-start gap-2 mb-1">
-                <Sparkles size={14} className="text-sky-500 mt-0.5" />
-                <span className="text-[10px] uppercase font-bold tracking-wider text-sky-600">
-                  SmartGuide
-                </span>
-              </div>
-            )}
-            <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+            <MessageBody content={msg.content} />
           </div>
         ))}
+
         {sending && (
-          <div className="mr-auto bg-white border border-slate-100 text-slate-800 p-3 rounded-2xl shadow-sm flex items-center gap-2">
-            <Loader2 size={16} className="animate-spin text-sky-500" />
-            <span className="text-sm">Thinking...</span>
+          <div className="mr-auto flex items-center gap-2 rounded-2xl rounded-bl-md border border-slate-200 bg-white px-3.5 py-2.5 text-slate-700 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">
+            <Loader2 size={15} className="animate-spin text-sky-500" />
+            <span className="text-xs">Thinking…</span>
           </div>
         )}
-        <div ref={messagesEndRef} />
+
+        {!atBottom && (
+          <button
+            onClick={() => {
+              atBottomRef.current = true;
+              scrollToBottom();
+            }}
+            className="sticky bottom-0 left-1/2 z-10 flex h-8 w-8 -translate-x-1/2 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-lg dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
+            aria-label="Scroll to latest message"
+          >
+            <ArrowDown size={15} />
+          </button>
+        )}
       </div>
 
       {/* Input */}
-      <div className="p-3 border-t border-slate-200 bg-white rounded-b-2xl">
-        <form onSubmit={handleSend} className="relative group">
-          <input
-            type="text"
+      <div className="border-t border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-900">
+        <form onSubmit={handleSend} className="relative">
+          <textarea
+            ref={inputRef}
+            rows={1}
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask about travel..."
-            className="input pl-10 pr-10 py-2.5 text-sm"
+            onKeyDown={handleKeyDown}
+            placeholder="Ask about travel… (Enter to send)"
+            aria-label="Message SmartGuide"
+            className="max-h-24 w-full resize-none rounded-xl border border-slate-200 bg-white py-2.5 pl-3 pr-11 text-sm text-slate-900 placeholder-slate-400 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
           />
-          <div className="absolute left-3 top-3 text-slate-400">
-            <MessageCircle size={16} />
-          </div>
           <button
             type="submit"
             disabled={sending || !input.trim()}
-            className="absolute right-3 top-2.5 text-sky-600 hover:text-sky-700 disabled:opacity-50 transition-colors"
+            className="absolute right-2 top-2 rounded-lg p-1.5 text-sky-600 transition hover:bg-sky-50 disabled:opacity-40 dark:text-sky-400 dark:hover:bg-sky-900/30"
+            aria-label="Send message"
           >
-            <Send size={18} />
+            {sending ? <Loader2 size={17} className="animate-spin" /> : <Send size={17} />}
           </button>
         </form>
+        <p className="mt-1.5 text-center text-[10px] text-slate-400 dark:text-slate-400">
+          SmartGuide can make mistakes — verify important travel details.
+        </p>
       </div>
     </div>
   );
