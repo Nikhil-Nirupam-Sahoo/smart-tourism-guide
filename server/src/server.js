@@ -19,6 +19,7 @@ app.use(cors({ origin: process.env.CLIENT_URL || '*' }));
 app.use(express.json({ limit: '10mb' }));
 
 let seedInfo = 'starting';
+let seedErrors = [];
 
 // Health check
 app.get('/api/health', (_req, res) => {
@@ -28,6 +29,7 @@ app.get('/api/health', (_req, res) => {
     version: '2026-11-20-india',
     destinations: seedDestinations.length,
     seedInfo,
+    ...(seedErrors.length ? { seedErrors: seedErrors.slice(0, 3) } : {}),
     time: new Date().toISOString(),
   });
 });
@@ -100,6 +102,7 @@ async function connectAndSeed() {
       }
     }
 
+    seedErrors = failures;
     if (failures.length) console.warn('⚠️  Seed warnings:', failures.slice(0, 5).join(' | '));
     const total = await Destination.countDocuments();
     seedInfo = `done — ${total} destinations, ${failures.length} seed warnings`;
