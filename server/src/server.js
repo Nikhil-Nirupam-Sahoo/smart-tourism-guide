@@ -79,7 +79,9 @@ async function connectAndSeed() {
     const failures = [];
 
     // Always upsert: works on a fresh database and on an existing one with new seeds.
-    for (const d of seedDestinations) {
+    for (const seed of seedDestinations) {
+      // Strip any in-memory-only id before writing to MongoDB.
+      const { _id, ...d } = seed;
       try {
         await Destination.updateOne({ name: d.name }, { $setOnInsert: d }, { upsert: true });
         await Destination.updateOne(

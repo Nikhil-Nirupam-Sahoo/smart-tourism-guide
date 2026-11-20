@@ -17,8 +17,13 @@ const generateId = (prefix) => `${prefix}_${Date.now()}_${Math.random().toString
 const seedDestinations = require('../data/destinations');
 
 seedDestinations.forEach((d) => {
-  d._id = generateId('dest');
-  destinations.push(d);
+  // Clone: never mutate the shared seed objects (server.js reuses them for Mongo).
+  destinations.push({
+    ...d,
+    gallery: [...(d.gallery || [])],
+    tags: [...(d.tags || [])],
+    _id: generateId('dest'),
+  });
 });
 
 // ---------- Helpers ----------
