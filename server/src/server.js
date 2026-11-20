@@ -18,6 +18,8 @@ const PORT = process.env.PORT || 5000;
 app.use(cors({ origin: process.env.CLIENT_URL || '*' }));
 app.use(express.json({ limit: '10mb' }));
 
+let seedInfo = 'starting';
+
 // Health check
 app.get('/api/health', (_req, res) => {
   res.json({
@@ -25,6 +27,7 @@ app.get('/api/health', (_req, res) => {
     service: 'smart-tourism-server',
     version: '2026-11-20-india',
     destinations: seedDestinations.length,
+    seedInfo,
     time: new Date().toISOString(),
   });
 });
@@ -59,54 +62,52 @@ async function connectAndSeed() {
   const mongoUri = process.env.MONGO_URI;
 
   if (!mongoUri) {
+    seedInfo = 'demo mode (no MONGO_URI)';
     console.warn('⚠️  MONGO_URI not set — running in demo mode (in-memory data)');
     console.log(`🌱 Using ${memory.destinations ? memory.destinations.length : 'seed'} in-memory destinations`);
     return;
   }
 
   try {
-    await mongoose.connect(mongoUri, {
-      // modern mongoose doesn't need useNewUrlParser / useUnifiedTopology
-    });
+    await mongoose.connect(mongoUri);
     console.log('✅ Connected to MongoDB');
+    seedInfo = 'connected, seeding…';
 
     const Destination = require('./models/Destination');
-    const count = await Destination.countDocuments();
-    if (count === 0) {
-      await Destination.insertMany(seedDestinations);
-      console.log(`🌱 Seeded ${seedDestinations.length} demo destinations`);
-    } else {
-      // Upsert every seed destination: insert new ones (e.g. new Indian cities)
-      // and refresh images/booking links on existing ones.
-      const failures = [];
-      for (const d of seedDestinations) {
-        try {
-          await Destination.updateOne({ name: d.name }, { $setOnInsert: d }, { upsert: true });
-          await Destination.updateOne(
-            { name: d.name },
-            {
-              $set: {
-                image: d.image,
-                gallery: d.gallery,
-                bookingLinks: d.bookingLinks,
-                description: d.description,
-                shortDescription: d.shortDescription,
-                tags: d.tags,
-                bestTimeToVisit: d.bestTimeToVisit,
-                location: d.location,
-              },
-            }
-          );
-        } catch (seedErr) {
-          failures.push(`${d.name}: ${seedErr.message}`);
-        }
+    const failures = [];
+
+    // Always upsert: works on a fresh database and on an existing one with new seeds.
+    for (const d of seedDestinations) {
+      try {
+        await Destination.updateOne({ name: d.name }, { $setOnInsert: d }, { upsert: true });
+        await Destination.updateOne(
+          { name: d.name },
+          {
+            $set: {
+              image: d.image,
+              gallery: d.gallery,
+              bookingLinks: d.bookingLinks,
+              description: d.description,
+              shortDescription: d.shortDescription,
+              tags: d.tags,
+              bestTimeToVisit: d.bestTimeToVisit,
+              location: d.location,
+            },
+          }
+        );
+      } catch (seedErr) {
+        failures.push(`${d.name}: ${seedErr.message}`);
       }
-      if (failures.length) console.warn('⚠️  Seed warnings:', failures.slice(0, 5).join(' | '));
-      const updatedCount = await Destination.countDocuments();
-      console.log(`📊 ${count} → ${updatedCount} destinations in database (seed upsert complete)`);
     }
+
+    if (failures.length) console.warn('⚠️  Seed warnings:', failures.slice(0, 5).join(' | '));
+    const total = await Destination.countDocuments();
+    seedInfo = `done — ${total} destinations, ${failures.length} seed warnings`;
+    console.log(`📊 ${total} destinations in database (seed complete)`);
+    if (failures.length) console.warn('   First failures:', failures.slice(0, 5).join(' | '));
   } catch (err) {
-    console.error('❌ MongoDB connection failed:', err.message);
+    seedInfo = `error: ${err.message}`;
+    console.error('❌ MongoDB connection/seed failed:', err.message);
     console.warn('⚠️  Falling back to in-memory demo data');
   }
 }
