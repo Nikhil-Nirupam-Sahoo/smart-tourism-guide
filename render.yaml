@@ -1,0 +1,37 @@
+# Render deployment blueprint for Smart Tourism Guide
+# Creates: 1 Node web service (API) + 1 static site (React frontend)
+# After first deploy, set VITE_API_URL on the static site to your backend URL.
+
+services:
+  - type: web
+    name: smart-tourism-api
+    env: node
+    region: oregon
+    rootDir: server
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: MONGO_URI
+        sync: false   # set this manually to your MongoDB Atlas URI
+      - key: AI_PROVIDER
+        value: mock
+      - key: CLIENT_URL
+        value: https://smart-tourism-guide.onrender.com
+
+  - type: static
+    name: smart-tourism-guide
+    env: node
+    region: oregon
+    buildCommand: cd client && npm install && npm run build
+    staticPublishPath: client/dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://smart-tourism-api.onrender.com/api
