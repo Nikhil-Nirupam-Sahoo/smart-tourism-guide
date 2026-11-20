@@ -21,10 +21,10 @@ const seedDestinations = [
     city: 'Paris',
     description: 'The City of Light, famous for its art, fashion, gastronomy, and iconic landmarks like the Eiffel Tower and Louvre Museum.',
     shortDescription: 'Art, fashion, and romance on the Seine.',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Eiffel_Tower_%28cropped%29.jpg/1024px-Eiffel_Tower_%28cropped%29.jpg',
+    image: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4b/La_Tour_Eiffel_vue_de_la_Tour_Saint-Jacques%2C_Paris_ao%C3%BBt_2014_%282%29.jpg/960px-La_Tour_Eiffel_vue_de_la_Tour_Saint-Jacques%2C_Paris_ao%C3%BBt_2014_%282%29.jpg',
     gallery: [
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Eiffel_Tower_%28cropped%29.jpg/1024px-Eiffel_Tower_%28cropped%29.jpg',
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Musee_du_Louvre_%28cropped%29.jpg/1024px-Musee_du_Louvre_%28cropped%29.jpg',
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4b/La_Tour_Eiffel_vue_de_la_Tour_Saint-Jacques%2C_Paris_ao%C3%BBt_2014_%282%29.jpg/960px-La_Tour_Eiffel_vue_de_la_Tour_Saint-Jacques%2C_Paris_ao%C3%BBt_2014_%282%29.jpg',
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/6/66/Louvre_Museum_Wikimedia_Commons.jpg/960px-Louvre_Museum_Wikimedia_Commons.jpg',
     ],
     category: 'culture',
     tags: ['romance', 'museums', 'fashion', 'food'],
@@ -42,10 +42,10 @@ const seedDestinations = [
     city: 'Tokyo',
     description: 'A vibrant metropolis where ultramodern skyscrapers stand beside historic temples, offering world-class dining and unique culture.',
     shortDescription: 'Neon lights, temples, and cutting-edge tech.',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Tokyo_Tower_%2813608033575%29.jpg/1024px-Tokyo_Tower_%2813608033575%29.jpg',
+    image: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b2/Skyscrapers_of_Shinjuku_2009_January.jpg/960px-Skyscrapers_of_Shinjuku_2009_January.jpg',
     gallery: [
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Tokyo_Tower_%2813608033575%29.jpg/1024px-Tokyo_Tower_%2813608033575%29.jpg',
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Senso-ji_Temple%2C_Tokyo.jpg/1024px-Senso-ji_Temple%2C_Tokyo.jpg',
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b2/Skyscrapers_of_Shinjuku_2009_January.jpg/960px-Skyscrapers_of_Shinjuku_2009_January.jpg',
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/4/43/Sensoji_2023.jpg/960px-Sensoji_2023.jpg',
     ],
     category: 'city',
     tags: ['technology', 'food', 'shopping', 'temples'],
@@ -63,10 +63,10 @@ const seedDestinations = [
     city: 'Denpasar',
     description: 'Tropical paradise known for its lush rice terraces, volcanic mountains, coral reefs, and spiritual retreats.',
     shortDescription: 'Tropical beaches and serene rice terraces.',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Pura_Lempuyang_Luhur.jpg/1024px-Pura_Lempuyang_Luhur.jpg',
+    image: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8d/TanahLot_2014.JPG/960px-TanahLot_2014.JPG',
     gallery: [
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Pura_Lempuyang_Luhur.jpg/1024px-Pura_Lempuyang_Luhur.jpg',
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Tegalalang_Rice_Terrace%2C_Bali.jpg/1024px-Tegalalang_Rice_Terrace%2C_Bali.jpg',
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8d/TanahLot_2014.JPG/960px-TanahLot_2014.JPG',
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5d/Ubud_%2849818456887%29.jpg/960px-Ubud_%2849818456887%29.jpg',
     ],
     category: 'relaxation',
     tags: ['beach', 'wellness', 'surfing', 'temples'],
@@ -84,10 +84,10 @@ const seedDestinations = [
     city: 'Barcelona',
     description: 'Mediterranean city renowned for Gaudí architecture, lively tapas culture, beaches, and a rich artistic heritage.',
     shortDescription: 'Gaudí architecture and Mediterranean vibes.',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Sagrada_Familia_%28Facade%29.jpg/1024px-Sagrada_Familia_%28Facade%29.jpg',
+    image: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ef/SF_maig_2_cropped.jpg/960px-SF_maig_2_cropped.jpg',
     gallery: [
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Sagrada_Familia_%28Facade%29.jpg/1024px-Sagrada_Familia_%28Facade%29.jpg',
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Parc_G%C3%BCell%2C_Barcelona.jpg/1024px-Parc_G%C3%BCell%2C_Barcelona.jpg',
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ef/SF_maig_2_cropped.jpg/960px-SF_maig_2_cropped.jpg',
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/3/33/Parc_guell_-_panoramio.jpg/960px-Parc_guell_-_panoramio.jpg',
     ],
     category: 'food',
     tags: ['architecture', 'tapas', 'beach', 'art'],
@@ -105,10 +105,10 @@ const seedDestinations = [
     city: 'Cape Town',
     description: 'Stunning coastal city dominated by Table Mountain, with beaches, vineyards, and rich wildlife nearby.',
     shortDescription: 'Table Mountain, beaches, and vineyards.',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Table_Mountain_Aerial_Cableway%2C_Cape_Town.jpg/1024px-Table_Mountain_Aerial_Cableway%2C_Cape_Town.jpg',
+    image: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/d/dc/Table_Mountain_DanieVDM.jpg/960px-Table_Mountain_DanieVDM.jpg',
     gallery: [
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Table_Mountain_Aerial_Cableway%2C_Cape_Town.jpg/1024px-Table_Mountain_Aerial_Cableway%2C_Cape_Town.jpg',
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Victoria_%26_Alfred_Waterfront%2C_Cape_Town.jpg/1024px-Victoria_%26_Alfred_Waterfront%2C_Cape_Town.jpg',
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/d/dc/Table_Mountain_DanieVDM.jpg/960px-Table_Mountain_DanieVDM.jpg',
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8d/Camps_bay_%2853460319478%29_%28cropped%29.jpg/960px-Camps_bay_%2853460319478%29_%28cropped%29.jpg',
     ],
     category: 'nature',
     tags: ['hiking', 'wine', 'wildlife', 'beach'],
@@ -126,10 +126,10 @@ const seedDestinations = [
     city: 'Kyoto',
     description: 'Ancient capital filled with classical Buddhist temples, gardens, imperial palaces, Shinto shrines, and traditional wooden houses.',
     shortDescription: 'Temples, gardens, and traditional Japan.',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Kinkaku-ji_%28Golden_Pavilion%29%2C_Kyoto.jpg/1024px-Kinkaku-ji_%28Golden_Pavilion%29%2C_Kyoto.jpg',
+    image: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ae/Kiyomizu-dera%2C_Kyoto%2C_November_2016_-02.jpg/960px-Kiyomizu-dera%2C_Kyoto%2C_November_2016_-02.jpg',
     gallery: [
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Kinkaku-ji_%28Golden_Pavilion%29%2C_Kyoto.jpg/1024px-Kinkaku-ji_%28Golden_Pavilion%29%2C_Kyoto.jpg',
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Fushimi_Inari_Taisha%2C_Kyoto.jpg/1024px-Fushimi_Inari_Taisha%2C_Kyoto.jpg',
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ae/Kiyomizu-dera%2C_Kyoto%2C_November_2016_-02.jpg/960px-Kiyomizu-dera%2C_Kyoto%2C_November_2016_-02.jpg',
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0e/Torii_path_with_lantern_at_Fushimi_Inari_Taisha_Shrine%2C_Kyoto%2C_Japan.jpg/960px-Torii_path_with_lantern_at_Fushimi_Inari_Taisha_Shrine%2C_Kyoto%2C_Japan.jpg',
     ],
     category: 'history',
     tags: ['temples', 'cherry blossoms', 'tea ceremony', 'culture'],
@@ -171,7 +171,7 @@ const memory = {
       name: data.name,
       email: data.email.toLowerCase(),
       password: await bcrypt.hash(data.password, 10),
-      role: 'traveler',
+      role: data.role || 'traveler',
       preferences: {
         interests: [],
         budgetLevel: 'mid-range',
@@ -308,8 +308,29 @@ const memory = {
   // ---------- Share token (in-memory) ----------
   findTripByShareToken: async (token) => trips.find((t) => t.shareToken === token && t.isPublic),
 
-  // ---------- User count (in-memory) ----------
+  // ---------- User counts / roles (in-memory) ----------
   countUsers: async () => users.length,
+  countAdmins: async () => users.filter((u) => u.role === 'admin').length,
+  countTrips: async () => trips.filter((t) => t.isArchived !== true).length,
+  listUsers: async () => users.map((u) => {
+    const { password, ...safe } = u;
+    return safe;
+  }),
+  listDestinations: async (filter = {}, options = {}) => {
+    let result = destinations;
+    if (filter.isFeatured === true) result = result.filter((d) => d.isFeatured);
+    if (filter.isFeatured === false) result = result.filter((d) => !d.isFeatured);
+    const total = result.length;
+    const skip = options.skip || 0;
+    const limit = options.limit || 20;
+    return { destinations: result.slice(skip, skip + limit), total };
+  },
+  promoteToAdmin: async (id) => {
+    const user = users.find((u) => u._id === id);
+    if (!user) return null;
+    user.role = 'admin';
+    return user;
+  },
 };
 
 module.exports = memory;

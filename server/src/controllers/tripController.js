@@ -1,4 +1,5 @@
 const asyncHandler = require('express-async-handler');
+const crypto = require('crypto');
 const {
   createTrip: dbCreateTrip,
   findTrips,
@@ -23,7 +24,7 @@ const getTripById = asyncHandler(async (req, res) => {
     throw new Error('Trip not found');
   }
   const ownerId = trip.user && (trip.user._id || trip.user);
-  if (ownerId !== req.user.id && !trip.isPublic) {
+  if (ownerId !== req.user.id && !trip.isPublic && req.user.role !== 'admin') {
     res.status(403);
     throw new Error('Not authorized to view this trip');
   }
@@ -101,6 +102,12 @@ const updateTrip = asyncHandler(async (req, res) => {
   const allowed = ['title','startDate','endDate','durationDays','travelers','budgetLevel','interests','itinerary','isPublic'];
   const updates = {};
   allowed.forEach((f) => { if (req.body[f] !== undefined) updates[f] = req.body[f]; });
+
+  // findByIdAndUpdate bypasses the schema pre-save hook, so create the token here.
+  if (updates.isPublic === true && !trip.shareToken) {
+    updates.shareToken = crypto.randomBytes(16).toString('hex');
+  }
+
   const updated = await updateTripById(req.params.id, updates);
   res.json(updated);
 });

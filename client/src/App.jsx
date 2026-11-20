@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, Link } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { DarkModeProvider } from './context/DarkModeContext';
 import Navbar from './components/Navbar';
@@ -33,9 +33,20 @@ function GuestRoute({ children }) {
 }
 
 function AdminRoute({ children }) {
-  const { user, loading } = useAuth();
+  const { user, loading, isAuthenticated } = useAuth();
   if (loading) return null;
-  if (!user || user.role !== 'admin') return <Navigate to="/" replace />;
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (user?.role !== 'admin') {
+    return (
+      <div className="max-w-xl mx-auto px-4 py-16 text-center">
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Admin access required</h1>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
+          Your account doesn't have admin privileges yet. Sign out and sign back in once to refresh your role.
+        </p>
+        <Link to="/" className="btn btn-outline">Back to home</Link>
+      </div>
+    );
+  }
   return children;
 }
 
@@ -54,6 +65,16 @@ function AppRoutes() {
       <Route
         path="/admin"
         element={<AdminRoute><Admin /></AdminRoute>}
+      />
+      <Route
+        path="*"
+        element={
+          <div className="max-w-xl mx-auto px-4 py-16 text-center">
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Page not found</h1>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">That page doesn't exist.</p>
+            <Link to="/" className="btn btn-outline">Back to home</Link>
+          </div>
+        }
       />
     </Routes>
   );

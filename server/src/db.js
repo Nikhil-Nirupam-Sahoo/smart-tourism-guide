@@ -17,6 +17,28 @@ const countUsers = async () => {
   return memory.countUsers();
 };
 
+const countAdmins = async () => {
+  if (isConnected()) return User.countDocuments({ role: 'admin' });
+  return memory.countAdmins();
+};
+
+const countTrips = async () => {
+  if (isConnected()) return Trip.countDocuments();
+  return memory.countTrips();
+};
+
+const listUsers = async () => {
+  if (isConnected()) return User.find({}, '-password').sort({ createdAt: -1 }).limit(50);
+  return memory.listUsers();
+};
+
+const promoteToAdmin = async (id) => {
+  if (isConnected()) {
+    return User.findByIdAndUpdate(id, { role: 'admin' }, { new: true });
+  }
+  return memory.promoteToAdmin(id);
+};
+
 const createUser = async (data) => {
   if (isConnected()) {
     const user = new User(data);
@@ -91,9 +113,29 @@ const countDocuments = async (filter = {}) => {
   return memory.countDocuments(filter);
 };
 
+const listDestinations = async (filter = {}, options = {}) => {
+  if (isConnected()) {
+    const skip = options.skip || 0;
+    const limit = options.limit || 20;
+    const [results, total] = await Promise.all([
+      Destination.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit),
+      Destination.countDocuments(filter),
+    ]);
+    return { destinations: results, total };
+  }
+  return memory.listDestinations(filter, options);
+};
+
 const findDestinationById = async (id) => {
   if (isConnected()) return Destination.findById(id);
   return memory.findDestinationById(id);
+};
+
+const findDestinationByIdAndUpdate = async (id, updates) => {
+  if (isConnected()) {
+    return Destination.findByIdAndUpdate(id, updates, { new: true, runValidators: true });
+  }
+  return memory.findDestinationByIdAndUpdate(id, updates);
 };
 
 const distinctCategories = async () => {
@@ -158,8 +200,9 @@ const deleteTripById = async (id) => {
 
 module.exports = {
   isConnected,
-  countUsers,
+  countUsers, countAdmins, countTrips, promoteToAdmin, listUsers,
   createUser, findUserByEmail, findUserById, updateUserById, toggleFavorite, getFavorites,
-  findDestinations, countDocuments, findDestinationById, distinctCategories, fetchWeather,
+  findDestinations, countDocuments, listDestinations, findDestinationById,
+  findDestinationByIdAndUpdate, distinctCategories, fetchWeather,
   createTrip, findTrips, findTripById, findTripByShareToken, updateTripById, deleteTripById,
 };

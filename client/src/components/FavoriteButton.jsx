@@ -1,12 +1,17 @@
+import { useEffect, useState } from 'react';
 import { Star } from 'lucide-react';
 import { useUser } from '../context/AuthContext';
 import { userAPI } from '../services/api';
 import { toast } from 'react-hot-toast';
 
 export default function FavoriteButton({ destinationId, isFavorited }) {
-  const { user } = useUser();
+  const user = useUser();
   const [toggling, setToggling] = useState(false);
-  const [isFav, setIsFav] = useState(isFavorited);
+  const [isFav, setIsFav] = useState(Boolean(isFavorited));
+
+  useEffect(() => {
+    if (typeof isFavorited === 'boolean') setIsFav(isFavorited);
+  }, [isFavorited]);
 
   if (!user) {
     return (
@@ -24,7 +29,7 @@ export default function FavoriteButton({ destinationId, isFavorited }) {
     setToggling(true);
     try {
       const res = await userAPI.toggleFavorite(destinationId);
-      setIsFav(res.isFav);
+      setIsFav(Boolean(res.isFav));
       toast.success(res.isFav ? 'Added to favorites' : 'Removed from favorites');
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to update favorite');

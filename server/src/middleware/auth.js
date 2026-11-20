@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const asyncHandler = require('express-async-handler');
+const { findUserById } = require('../db');
 
 /**
  * Protect routes — requires a valid JWT in the Authorization header.
@@ -15,7 +16,14 @@ const protect = asyncHandler(async (req, res, next) => {
     try {
       token = req.headers.authorization.split(' ')[1];
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      req.user = { id: decoded.id, email: decoded.email, role: decoded.role };
+      // Use the current role from the database so a role change (or upgrade)
+      // takes effect immediately, even with an older token.
+      const freshUser = await findUserById(decoded.id);
+      req.user = {
+        id: decoded.id,
+        email: decoded.email,
+        role: freshUser ? freshUser.role : decoded.role,
+      };
       return next();
     } catch (err) {
       res.status(401);

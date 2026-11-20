@@ -2,11 +2,12 @@ const asyncHandler = require('express-async-handler');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const {
-  countUsers,
+  countAdmins,
   createUser,
   findUserByEmail,
   findUserById,
   updateUserById,
+  promoteToAdmin,
 } = require('../db');
 
 /**
@@ -36,9 +37,9 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new Error('User already exists with this email');
   }
 
-  // First registered user becomes admin
-  const userCount = await countUsers();
-  const role = userCount === 0 ? 'admin' : 'traveler';
+  // The first account in a fresh deployment becomes admin.
+  const adminCount = await countAdmins();
+  const role = adminCount === 0 ? 'admin' : 'traveler';
 
   const user = await createUser({ name, email, password, role });
 
@@ -79,12 +80,20 @@ const loginUser = asyncHandler(async (req, res) => {
     throw new Error('Invalid email or password');
   }
 
+  // If this deployment has no admin yet, promote the first user who signs in.
+  // This makes existing accounts admin after an upgrade without manual DB edits.
+  let role = user.role;
+  if (role !== 'admin' && (await countAdmins()) === 0) {
+    const promoted = await promoteToAdmin(user._id);
+    role = promoted?.role || 'admin';
+  }
+
   res.json({
     _id: user._id,
     name: user.name,
     email: user.email,
-    role: user.role,
-    token: generateToken(user._id, user.email, user.role),
+    role,
+    token: generateToken(user._id, user.email, role),
   });
 });
 
