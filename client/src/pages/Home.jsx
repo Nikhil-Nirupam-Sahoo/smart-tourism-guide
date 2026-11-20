@@ -22,7 +22,7 @@ export default function Home() {
     <div className="space-y-0">
       {/* Hero */}
       <section className="relative overflow-hidden rounded-3xl bg-slate-900 text-white p-8 md:p-12 animate-fade-in">
-        <div className="absolute inset-0 -z-10 bg-[url('https://images.unsplash.com/photo-1469854523082-cc61ee5d66bc?auto=format&fit=crop&w=1600&q=80')] bg-cover bg-center opacity-60"></div>
+        <div className="absolute inset-0 -z-10 bg-[url('https://thumb.wikimedia.org/wikipedia/commons/thumb/6/68/Taj_Mahal%2C_Agra%2C_India.jpg/1280px-Taj_Mahal%2C_Agra%2C_India.jpg')] bg-cover bg-center opacity-40"></div>
         <div className="max-w-2xl">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 backdrop-blur text-xs font-semibold text-sky-200 mb-6">
             <Sparkles size={14} className="text-cyan-400" />

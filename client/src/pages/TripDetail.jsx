@@ -166,7 +166,7 @@ export default function TripDetail() {
             },
           ].map((item) => (
             <div key={item.label} className="p-4 rounded-xl bg-slate-50 dark:bg-slate-700/30 border border-slate-100 dark:border-slate-700">
-              <p className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1">{item.label}</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400 mb-1">{item.label}</p>
               <p className="text-lg font-bold text-slate-900 dark:text-white">{item.value}</p>
             </div>
           ))}
@@ -193,7 +193,7 @@ export default function TripDetail() {
                     <div key={item.label} className="flex items-start gap-3">
                       <MapPin size={14} className="mt-1 flex-shrink-0 text-sky-500" />
                       <div>
-                        <p className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">{item.label}</p>
+                        <p className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400">{item.label}</p>
                         <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
                           {item.value || 'No activity planned'}
                         </p>

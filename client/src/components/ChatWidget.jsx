@@ -74,7 +74,7 @@ export default function ChatWidget({ open = true }) {
   return (
     <div className="fixed bottom-6 right-6 w-96 flex flex-col shadow-2xl rounded-2xl bg-white border border-slate-200 z-50 animate-slide-up">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 bg-gradient-to-r from-sky-600 to-cyan-500 text-white rounded-t-2xl">
+      <div className="flex items-center justify-between p-4 bg-gradient-to-r from-sky-700 to-cyan-600 text-white rounded-t-2xl">
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-full bg-white flex items-center justify-center text-sky-600">
             <MessageCircle size={14} />
@@ -86,7 +86,7 @@ export default function ChatWidget({ open = true }) {
         </div>
         <button
           onClick={() => setIsOpen(false)}
-          className="text-white/80 hover:text-white"
+          className="text-white hover:text-white/80"
           aria-label="Close chat"
         >
           ✕

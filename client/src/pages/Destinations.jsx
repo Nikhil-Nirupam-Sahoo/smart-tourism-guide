@@ -25,7 +25,7 @@ export default function Destinations() {
     try {
       const [catRes, destRes] = await Promise.all([
         destinationAPI.getCategories(),
-        destinationAPI.getAll({ limit: 50 }),
+        destinationAPI.getAll({ limit: 100 }),
       ]);
       setCategories(catRes.data || []);
       setDestinations(destRes.data?.destinations || []);
@@ -74,7 +74,8 @@ export default function Destinations() {
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Destinations</h1>
           <p className="text-slate-500 text-sm">
-            Discover {destinations.length} amazing places around the world
+            Discover {destinations.length} destinations — including{' '}
+            {destinations.filter((d) => d.country === 'India').length} across India
           </p>
         </div>
 

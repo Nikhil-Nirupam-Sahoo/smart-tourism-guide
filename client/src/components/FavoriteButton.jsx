@@ -45,7 +45,7 @@ export default function FavoriteButton({ destinationId, isFavorited }) {
       className={`p-2 rounded-lg border transition-colors ${
         isFav
           ? 'bg-amber-100 text-amber-600 border-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-500'
-          : 'border-slate-200 bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'
+          : 'border-slate-200 bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
       }`}
       title={isFav ? 'Remove from favorites' : 'Add to favorites'}
     >
