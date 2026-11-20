@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { DarkModeProvider } from './context/DarkModeContext';
 import Navbar from './components/Navbar';
 import ChatWidget from './components/ChatWidget';
 import Home from './pages/Home';
@@ -10,6 +11,7 @@ import TripDetail from './pages/TripDetail';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
+import Admin from './pages/Admin';
 
 import { Toaster } from 'react-hot-toast';
 
@@ -17,7 +19,6 @@ function ToastPosition() {
   return <Toaster position="top-right" richColors />;
 }
 
-// Protected route wrapper
 function ProtectedRoute({ children }) {
   const { isAuthenticated, loading } = useAuth();
   if (loading) return null;
@@ -31,6 +32,13 @@ function GuestRoute({ children }) {
   return children;
 }
 
+function AdminRoute({ children }) {
+  const { user, loading } = useAuth();
+  if (loading) return null;
+  if (!user || user.role !== 'admin') return <Navigate to="/" replace />;
+  return children;
+}
+
 function AppRoutes() {
   return (
     <Routes>
@@ -39,17 +47,13 @@ function AppRoutes() {
       <Route path="/register" element={<GuestRoute><Register /></GuestRoute>} />
       <Route path="/destinations" element={<Destinations />} />
       <Route path="/destinations/:id" element={<DestinationDetail />} />
+      <Route path="/trips" element={<ProtectedRoute><Trips /></ProtectedRoute>} />
+      <Route path="/trips/:id" element={<ProtectedRoute><TripDetail /></ProtectedRoute>} />
+      <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+      <Route path="/trip-shared/:token" element={<TripDetail />} />
       <Route
-        path="/trips"
-        element={<ProtectedRoute><Trips /></ProtectedRoute>}
-      />
-      <Route
-        path="/trips/:id"
-        element={<ProtectedRoute><TripDetail /></ProtectedRoute>}
-      />
-      <Route
-        path="/profile"
-        element={<ProtectedRoute><Profile /></ProtectedRoute>}
+        path="/admin"
+        element={<AdminRoute><Admin /></AdminRoute>}
       />
     </Routes>
   );
@@ -58,12 +62,14 @@ function AppRoutes() {
 export default function App() {
   return (
     <AuthProvider>
-      <div className="min-h-screen bg-slate-50">
-        <Navbar />
-        <AppRoutes />
-        <ToastPosition />
-        <ChatWidget />
-      </div>
+      <DarkModeProvider>
+        <div className="min-h-screen transition-colors duration-300">
+          <Navbar />
+          <AppRoutes />
+          <ToastPosition />
+          <ChatWidget />
+        </div>
+      </DarkModeProvider>
     </AuthProvider>
   );
 }

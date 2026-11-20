@@ -2,6 +2,7 @@ const asyncHandler = require('express-async-handler');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const {
+  countUsers,
   createUser,
   findUserByEmail,
   findUserById,
@@ -35,7 +36,11 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new Error('User already exists with this email');
   }
 
-  const user = await createUser({ name, email, password });
+  // First registered user becomes admin
+  const userCount = await countUsers();
+  const role = userCount === 0 ? 'admin' : 'traveler';
+
+  const user = await createUser({ name, email, password, role });
 
   res.status(201).json({
     _id: user._id,

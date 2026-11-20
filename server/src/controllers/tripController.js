@@ -3,34 +3,25 @@ const {
   createTrip: dbCreateTrip,
   findTrips,
   findTripById,
-  findDestinationById,
+  findTripByShareToken,
   updateTripById,
   deleteTripById,
+  findDestinationById,
+  findUserById,
 } = require('../db');
 const { chatCompletion } = require('../services/aiService');
 
-/**
- * @desc    Get all trips for the logged-in user
- * @route   GET /api/trips
- * @access  Private
- */
 const getMyTrips = asyncHandler(async (req, res) => {
   const trips = await findTrips({ user: req.user.id, isArchived: { $ne: true } }, { sort: { createdAt: -1 } });
   res.json(trips);
 });
 
-/**
- * @desc    Get a single trip by ID
- * @route   GET /api/trips/:id
- * @access  Private
- */
 const getTripById = asyncHandler(async (req, res) => {
   const trip = await findTripById(req.params.id);
   if (!trip) {
     res.status(404);
     throw new Error('Trip not found');
   }
-  // Only allow owner to view private trips
   const ownerId = trip.user && (trip.user._id || trip.user);
   if (ownerId !== req.user.id && !trip.isPublic) {
     res.status(403);
@@ -39,22 +30,19 @@ const getTripById = asyncHandler(async (req, res) => {
   res.json(trip);
 });
 
-/**
- * @desc    Create a new trip (optionally AI-generated itinerary)
- * @route   POST /api/trips
- * @access  Private
- */
+const getTripByShare = asyncHandler(async (req, res) => {
+  const trip = await findTripByShareToken(req.params.token);
+  if (!trip) {
+    res.status(404);
+    throw new Error('Trip not found or not public');
+  }
+  res.json(trip);
+});
+
 const createTrip = asyncHandler(async (req, res) => {
   const {
-    destination,
-    title,
-    startDate,
-    endDate,
-    durationDays,
-    travelers,
-    budgetLevel,
-    interests,
-    generateItinerary,
+    destination, title, startDate, endDate, durationDays, travelers,
+    budgetLevel, interests, generateItinerary,
   } = req.body;
 
   if (!destination || !title || !durationDays) {
@@ -62,7 +50,6 @@ const createTrip = asyncHandler(async (req, res) => {
     throw new Error('Please provide destination, title, and durationDays');
   }
 
-  // Verify destination exists
   const dest = await findDestinationById(destination);
   if (!dest) {
     res.status(404);
@@ -72,25 +59,20 @@ const createTrip = asyncHandler(async (req, res) => {
   let itinerary = [];
   if (generateItinerary) {
     const aiResponse = await chatCompletion(
-      [
-        {
-          role: 'user',
-          content: `Create a ${durationDays}-day travel itinerary for ${dest.name}, ${dest.country}. ` +
-            `Category: ${dest.category}. Budget level: ${budgetLevel || 'mid-range'}. ` +
-            `Interests: ${(interests || []).join(', ') || 'general sightseeing'}. ` +
-            `Travelers: ${travelers || 1}. ` +
-            `Return a clear day-by-day plan with morning, afternoon, and evening activities.`,
-        },
-      ],
+      [{
+        role: 'user',
+        content: `Create a ${durationDays}-day travel itinerary for ${dest.name}, ${dest.country}. ` +
+          `Category: ${dest.category}. Budget: ${budgetLevel || 'mid-range'}. ` +
+          `Interests: ${(interests || []).join(', ') || 'general sightseeing'}. ` +
+          `Travelers: ${travelers || 1}. Return day-by-day morning/afternoon/evening.`,
+      }],
       { temperature: 0.7, maxTokens: 1500 }
     );
     itinerary = parseAiItinerary(aiResponse, durationDays);
   }
 
   const trip = await dbCreateTrip({
-    user: req.user.id,
-    destination,
-    title,
+    user: req.user.id, destination, title,
     startDate: startDate ? new Date(startDate) : undefined,
     endDate: endDate ? new Date(endDate) : undefined,
     durationDays: Number(durationDays),
@@ -104,11 +86,6 @@ const createTrip = asyncHandler(async (req, res) => {
   res.status(201).json(trip);
 });
 
-/**
- * @desc    Update a trip
- * @route   PUT /api/trips/:id
- * @access  Private
- */
 const updateTrip = asyncHandler(async (req, res) => {
   const trip = await findTripById(req.params.id);
   if (!trip) {
@@ -118,35 +95,16 @@ const updateTrip = asyncHandler(async (req, res) => {
   const ownerId = trip.user && (trip.user._id || trip.user);
   if (ownerId !== req.user.id) {
     res.status(403);
-    throw new Error('Not authorized to update this trip');
+    throw new Error('Not authorized');
   }
 
-  const allowedFields = [
-    'title',
-    'startDate',
-    'endDate',
-    'durationDays',
-    'travelers',
-    'budgetLevel',
-    'interests',
-    'itinerary',
-    'isPublic',
-    'isArchived',
-  ];
+  const allowed = ['title','startDate','endDate','durationDays','travelers','budgetLevel','interests','itinerary','isPublic'];
   const updates = {};
-  allowedFields.forEach((field) => {
-    if (req.body[field] !== undefined) updates[field] = req.body[field];
-  });
-
+  allowed.forEach((f) => { if (req.body[f] !== undefined) updates[f] = req.body[f]; });
   const updated = await updateTripById(req.params.id, updates);
   res.json(updated);
 });
 
-/**
- * @desc    Delete a trip
- * @route   DELETE /api/trips/:id
- * @access  Private
- */
 const deleteTrip = asyncHandler(async (req, res) => {
   const trip = await findTripById(req.params.id);
   if (!trip) {
@@ -154,7 +112,8 @@ const deleteTrip = asyncHandler(async (req, res) => {
     throw new Error('Trip not found');
   }
   const ownerId = trip.user && (trip.user._id || trip.user);
-  if (ownerId !== req.user.id) {
+  // Allow owner OR admin to delete
+  if (ownerId !== req.user.id && req.user.role !== 'admin') {
     res.status(403);
     throw new Error('Not authorized to delete this trip');
   }
@@ -162,49 +121,29 @@ const deleteTrip = asyncHandler(async (req, res) => {
   res.json({ message: 'Trip removed' });
 });
 
-/**
- * Parse a free-form AI itinerary response into structured day plans.
- */
 function parseAiItinerary(text, days) {
   const plan = [];
-  // Split keeping the "**Day N**" header at the start of each block, then drop the intro.
   const dayBlocks = text.split(/(?=\*\*Day\s*\d+\*\*)/i).filter((b) => /\*\*Day\s*\d+\*\*/i.test(b));
   for (let i = 0; i < days && i < dayBlocks.length; i++) {
     const block = dayBlocks[i];
     const extract = (label) => {
-      const match = block.match(new RegExp(`${label}:\\s*([^\\n•]+)`, 'i'));
-      return match ? match[1].trim() : '';
+      const m = block.match(new RegExp(`${label}:\\s*([^\\n•]+)`, 'i'));
+      return m ? m[1].trim() : '';
     };
     plan.push({
-      day: i + 1,
-      title: `Day ${i + 1}`,
+      day: i + 1, title: `Day ${i + 1}`,
       morning: extract('Morning') || 'Explore the local area',
       afternoon: extract('Afternoon') || 'Visit a key attraction',
       evening: extract('Evening') || 'Enjoy local dining',
-      notes: '',
-      estimatedCost: '$$',
+      notes: '', estimatedCost: '$$',
     });
   }
   if (plan.length === 0) {
     for (let i = 0; i < days; i++) {
-      plan.push({
-        day: i + 1,
-        title: `Day ${i + 1}`,
-        morning: 'Morning activity',
-        afternoon: 'Afternoon activity',
-        evening: 'Evening activity',
-        notes: '',
-        estimatedCost: '$$',
-      });
+      plan.push({ day: i + 1, title: `Day ${i + 1}`, morning: 'Morning activity', afternoon: 'Afternoon activity', evening: 'Evening activity', notes: '', estimatedCost: '$$' });
     }
   }
   return plan;
 }
 
-module.exports = {
-  getMyTrips,
-  getTripById,
-  createTrip,
-  updateTrip,
-  deleteTrip,
-};
+module.exports = { getMyTrips, getTripById, getTripByShare, createTrip, updateTrip, deleteTrip };

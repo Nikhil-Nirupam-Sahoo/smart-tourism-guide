@@ -8,6 +8,8 @@ const authRoutes = require('./routes/authRoutes');
 const destinationRoutes = require('./routes/destinationRoutes');
 const tripRoutes = require('./routes/tripRoutes');
 const aiRoutes = require('./routes/aiRoutes');
+const userRoutes = require('./routes/userRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -26,6 +28,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/destinations', destinationRoutes);
 app.use('/api/trips', tripRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/admin', adminRoutes);
 
 // 404 handler
 app.use((_req, res) => {
@@ -49,10 +53,10 @@ const seedDestinations = [
     city: 'Paris',
     description: 'The City of Light, famous for its art, fashion, gastronomy, and iconic landmarks like the Eiffel Tower and Louvre Museum.',
     shortDescription: 'Art, fashion, and romance on the Seine.',
-    image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=800&q=80',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Eiffel_Tower_%28cropped%29.jpg/1024px-Eiffel_Tower_%28cropped%29.jpg',
     gallery: [
-      'https://images.unsplash.com/photo-1511739001486-6bfe1427b44c?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=800&q=80',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Eiffel_Tower_%28cropped%29.jpg/1024px-Eiffel_Tower_%28cropped%29.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Musee_du_Louvre_%28cropped%29.jpg/1024px-Musee_du_Louvre_%28cropped%29.jpg',
     ],
     category: 'culture',
     tags: ['romance', 'museums', 'fashion', 'food'],
@@ -62,6 +66,11 @@ const seedDestinations = [
     bestTimeToVisit: 'April to October',
     location: { type: 'Point', coordinates: [2.3522, 48.8566] },
     isFeatured: true,
+    bookingLinks: {
+      flights: 'https://www.skyscanner.com/',
+      hotels: 'https://www.booking.com/',
+      activities: 'https://www.getyourguide.com/',
+    },
   },
   {
     name: 'Tokyo',
@@ -69,10 +78,10 @@ const seedDestinations = [
     city: 'Tokyo',
     description: 'A vibrant metropolis where ultramodern skyscrapers stand beside historic temples, offering world-class dining and unique culture.',
     shortDescription: 'Neon lights, temples, and cutting-edge tech.',
-    image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=800&q=80',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Tokyo_Tower_%2813608033575%29.jpg/1024px-Tokyo_Tower_%2813608033575%29.jpg',
     gallery: [
-      'https://images.unsplash.com/photo-1539067728879-ab317b8e3e04?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=800&q=80',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Tokyo_Tower_%2813608033575%29.jpg/1024px-Tokyo_Tower_%2813608033575%29.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Senso-ji_Temple%2C_Tokyo.jpg/1024px-Senso-ji_Temple%2C_Tokyo.jpg',
     ],
     category: 'city',
     tags: ['technology', 'food', 'shopping', 'temples'],
@@ -82,6 +91,11 @@ const seedDestinations = [
     bestTimeToVisit: 'March to May, September to November',
     location: { type: 'Point', coordinates: [139.6917, 35.6895] },
     isFeatured: true,
+    bookingLinks: {
+      flights: 'https://www.skyscanner.com/',
+      hotels: 'https://www.booking.com/',
+      activities: 'https://www.getyourguide.com/',
+    },
   },
   {
     name: 'Bali',
@@ -89,10 +103,10 @@ const seedDestinations = [
     city: 'Denpasar',
     description: 'Tropical paradise known for its lush rice terraces, volcanic mountains, coral reefs, and spiritual retreats.',
     shortDescription: 'Tropical beaches and serene rice terraces.',
-    image: 'https://images.unsplash.com/photo-1537290961690-d8910cbc9762?auto=format&fit=crop&w=800&q=80',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Pura_Lempuyang_Luhur.jpg/1024px-Pura_Lempuyang_Luhur.jpg',
     gallery: [
-      'https://images.unsplash.com/photo-1527937352226-aa2565c5b2bb?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1537290961690-d8910cbc9762?auto=format&fit=crop&w=800&q=80',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Pura_Lempuyang_Luhur.jpg/1024px-Pura_Lempuyang_Luhur.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Tegalalang_Rice_Terrace%2C_Bali.jpg/1024px-Tegalalang_Rice_Terrace%2C_Bali.jpg',
     ],
     category: 'relaxation',
     tags: ['beach', 'wellness', 'surfing', 'temples'],
@@ -102,6 +116,11 @@ const seedDestinations = [
     bestTimeToVisit: 'April to October',
     location: { type: 'Point', coordinates: [115.1889, -8.4095] },
     isFeatured: true,
+    bookingLinks: {
+      flights: 'https://www.skyscanner.com/',
+      hotels: 'https://www.booking.com/',
+      activities: 'https://www.getyourguide.com/',
+    },
   },
   {
     name: 'Barcelona',
@@ -109,10 +128,10 @@ const seedDestinations = [
     city: 'Barcelona',
     description: 'Mediterranean city renowned for Gaudí architecture, lively tapas culture, beaches, and a rich artistic heritage.',
     shortDescription: 'Gaudí architecture and Mediterranean vibes.',
-    image: 'https://images.unsplash.com/photo-1532926437381-9968717a187f?auto=format&fit=crop&w=800&q=80',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Sagrada_Familia_%28Facade%29.jpg/1024px-Sagrada_Familia_%28Facade%29.jpg',
     gallery: [
-      'https://images.unsplash.com/photo-1537906710050-029921c7a6b6?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1532926437381-9968717a187f?auto=format&fit=crop&w=800&q=80',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Sagrada_Familia_%28Facade%29.jpg/1024px-Sagrada_Familia_%28Facade%29.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Parc_G%C3%BCell%2C_Barcelona.jpg/1024px-Parc_G%C3%BCell%2C_Barcelona.jpg',
     ],
     category: 'food',
     tags: ['architecture', 'tapas', 'beach', 'art'],
@@ -122,6 +141,11 @@ const seedDestinations = [
     bestTimeToVisit: 'May to October',
     location: { type: 'Point', coordinates: [2.1734, 41.3851] },
     isFeatured: false,
+    bookingLinks: {
+      flights: 'https://www.skyscanner.com/',
+      hotels: 'https://www.booking.com/',
+      activities: 'https://www.getyourguide.com/',
+    },
   },
   {
     name: 'Cape Town',
@@ -129,10 +153,10 @@ const seedDestinations = [
     city: 'Cape Town',
     description: 'Stunning coastal city dominated by Table Mountain, with beaches, vineyards, and rich wildlife nearby.',
     shortDescription: 'Table Mountain, beaches, and vineyards.',
-    image: 'https://images.unsplash.com/photo-1557813123-f9d9f0401a08?auto=format&fit=crop&w=800&q=80',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Table_Mountain_Aerial_Cableway%2C_Cape_Town.jpg/1024px-Table_Mountain_Aerial_Cableway%2C_Cape_Town.jpg',
     gallery: [
-      'https://images.unsplash.com/photo-1518578204556-4c2f0f0ee408?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1557813123-f9d9f0401a08?auto=format&fit=crop&w=800&q=80',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Table_Mountain_Aerial_Cableway%2C_Cape_Town.jpg/1024px-Table_Mountain_Aerial_Cableway%2C_Cape_Town.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Victoria_%26_Alfred_Waterfront%2C_Cape_Town.jpg/1024px-Victoria_%26_Alfred_Waterfront%2C_Cape_Town.jpg',
     ],
     category: 'nature',
     tags: ['hiking', 'wine', 'wildlife', 'beach'],
@@ -142,6 +166,11 @@ const seedDestinations = [
     bestTimeToVisit: 'November to March',
     location: { type: 'Point', coordinates: [18.4241, -33.9249] },
     isFeatured: false,
+    bookingLinks: {
+      flights: 'https://www.skyscanner.com/',
+      hotels: 'https://www.booking.com/',
+      activities: 'https://www.getyourguide.com/',
+    },
   },
   {
     name: 'Kyoto',
@@ -149,10 +178,10 @@ const seedDestinations = [
     city: 'Kyoto',
     description: 'Ancient capital filled with classical Buddhist temples, gardens, imperial palaces, Shinto shrines, and traditional wooden houses.',
     shortDescription: 'Temples, gardens, and traditional Japan.',
-    image: 'https://images.unsplash.com/photo-1493976040374-85c877968a1e?auto=format&fit=crop&w=800&q=80',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Kinkaku-ji_%28Golden_Pavilion%29%2C_Kyoto.jpg/1024px-Kinkaku-ji_%28Golden_Pavilion%29%2C_Kyoto.jpg',
     gallery: [
-      'https://images.unsplash.com/photo-1493976040374-85c877968a1e?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1469702235878-9866292501e2?auto=format&fit=crop&w=800&q=80',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Kinkaku-ji_%28Golden_Pavilion%29%2C_Kyoto.jpg/1024px-Kinkaku-ji_%28Golden_Pavilion%29%2C_Kyoto.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Fushimi_Inari_Taisha%2C_Kyoto.jpg/1024px-Fushimi_Inari_Taisha%2C_Kyoto.jpg',
     ],
     category: 'history',
     tags: ['temples', 'cherry blossoms', 'tea ceremony', 'culture'],
@@ -162,6 +191,11 @@ const seedDestinations = [
     bestTimeToVisit: 'March to May, October to November',
     location: { type: 'Point', coordinates: [135.7681, 35.0116] },
     isFeatured: false,
+    bookingLinks: {
+      flights: 'https://www.skyscanner.com/',
+      hotels: 'https://www.booking.com/',
+      activities: 'https://www.getyourguide.com/',
+    },
   },
 ];
 

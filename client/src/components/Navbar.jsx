@@ -11,8 +11,11 @@ import {
   LogOut,
   Compass,
   Settings,
+  Shield,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useDarkMode } from '../context/DarkModeContext';
+import DarkModeToggle from './DarkModeToggle';
 
 export default function Navbar() {
   const { user, logout, isAuthenticated } = useAuth();
@@ -53,11 +56,17 @@ export default function Navbar() {
 
           {/* Actions */}
           <div className="flex items-center gap-3">
+            <DarkModeToggle />
             {isAuthenticated ? (
               <>
+                {user.role === 'admin' && (
+                  <Link to="/admin" className="flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+                    <Shield size={16} /> Admin
+                  </Link>
+                )}
                 <button
                   onClick={logout}
-                  className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+                  className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
                 >
                   <LogOut size={16} /> Sign out
                 </button>
@@ -67,7 +76,7 @@ export default function Navbar() {
               </>
             ) : (
               <>
-                <Link to="/login" className="text-sm font-medium text-slate-600 hover:text-sky-500">
+                <Link to="/login" className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-sky-400">
                   Sign in
                 </Link>
                 <Link to="/register" className="btn btn-primary text-sm">

@@ -80,3 +80,8 @@ export function useAuth() {
   }
   return context;
 }
+
+export const useUser = () => {
+  const { user } = useAuth();
+  return user;
+};

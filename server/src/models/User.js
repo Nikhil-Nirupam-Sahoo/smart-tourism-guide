@@ -6,10 +6,10 @@ const userSchema = new mongoose.Schema(
     name: { type: String, required: true, trim: true },
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
     password: { type: String, required: true, minlength: 6 },
-    role: { type: String, enum: ['traveler', 'admin'], default: 'traveler' },
+    role: { type: String, enum: ['traveler','admin'], default: 'traveler' },
     preferences: {
       interests: [{ type: String }],
-      budgetLevel: { type: String, enum: ['budget', 'mid-range', 'luxury'], default: 'mid-range' },
+      budgetLevel: { type: String, enum: ['budget','mid-range','luxury'], default: 'mid-range' },
       favoriteDestinations: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Destination' }],
     },
     trips: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Trip' }],
@@ -17,7 +17,6 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Hash password before saving
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
   this.password = await bcrypt.hash(this.password, 10);

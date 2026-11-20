@@ -4,59 +4,37 @@ const {
   countDocuments,
   findDestinationById,
   distinctCategories,
+  fetchWeather,
 } = require('../db');
 
 /**
- * @desc    Get all destinations with optional filtering
- * @route   GET /api/destinations
- * @access  Public
+ * GET /api/destinations  — list with filtering, search, pagination
  */
 const getDestinations = asyncHandler(async (req, res) => {
   const {
-    category,
-    featured,
-    search,
-    minRating,
-    priceLevel,
-    page = 1,
-    limit = 20,
+    category, featured, search, minRating, priceLevel, page = 1, limit = 20,
   } = req.query;
 
   const filter = { isActive: true };
-
   if (category) filter.category = category;
   if (featured === 'true') filter.isFeatured = true;
   if (minRating) filter.rating = { $gte: Number(minRating) };
   if (priceLevel) filter.priceLevel = priceLevel;
-
-  if (search) {
-    filter.$text = { $search: search };
-  }
+  if (search) filter.$text = { $search: search };
 
   const pageNum = Math.max(parseInt(page, 10) || 1, 1);
   const limitNum = Math.min(Math.max(parseInt(limit, 10) || 20, 1), 100);
 
   const { destinations, total } = await findDestinations(filter, {
-    page: pageNum,
-    limit: limitNum,
+    page: pageNum, limit: limitNum,
     sort: featured === 'true' ? { isFeatured: -1, rating: -1 } : { rating: -1, createdAt: -1 },
   });
 
-  res.json({
-    destinations,
-    pagination: {
-      page: pageNum,
-      limit: limitNum,
-      total,
-      totalPages: Math.ceil(total / limitNum),
-    },
-  });
+  res.json({ destinations, pagination: { page: pageNum, limit: limitNum, total, totalPages: Math.ceil(total / limitNum) } });
 });
 
 /**
- * @desc    Get a single destination by ID
- * @route   GET /api/destinations/:id
- * @access  Public
+ * GET /api/destinations/:id  — single destination (+ weather if coords available)
  */
 const getDestinationById = asyncHandler(async (req, res) => {
   const destination = await findDestinationById(req.params.id);
@@ -64,26 +42,29 @@ const getDestinationById = asyncHandler(async (req, res) => {
     res.status(404);
     throw new Error('Destination not found');
   }
-  res.json(destination);
+
+  let weather = null;
+  const coords = destination.location?.coordinates;
+  if (coords && coords.length === 2) {
+    const [lon, lat] = coords;
+    weather = await fetchWeather(lat, lon);
+  }
+
+  res.json({ ...destination.toObject ? destination.toObject() : destination, weather });
 });
 
 /**
- * @desc    Get featured destinations
- * @route   GET /api/destinations/featured
- * @access  Public
+ * GET /api/destinations/featured
  */
 const getFeatured = asyncHandler(async (req, res) => {
   const { destinations } = await findDestinations(
-    { isActive: true, isFeatured: true },
-    { limit: 6, sort: { rating: -1 } }
+    { isActive: true, isFeatured: true }, { limit: 6, sort: { rating: -1 } }
   );
   res.json(destinations);
 });
 
 /**
- * @desc    Get all unique categories
- * @route   GET /api/destinations/categories
- * @access  Public
+ * GET /api/destinations/categories
  */
 const getCategories = asyncHandler(async (_req, res) => {
   const categories = await distinctCategories();

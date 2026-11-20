@@ -1,11 +1,7 @@
 /**
  * AI Service for Smart Tourism Guide
- *
- * Supports two providers:
- * - "openai": calls a real OpenAI-compatible LLM
- * - "mock": returns realistic travel responses without any API key
- *
- * To use a real LLM, set AI_PROVIDER=openai and OPENAI_API_KEY in .env
+ * Supports "openai" (real LLM) or "mock" (fallback, no API key).
+ * Set AI_PROVIDER=openai and OPENAI_API_KEY in .env to use real GPT.
  */
 
 const { OpenAI } = require('openai');
@@ -17,32 +13,16 @@ const OPENAI_BASE_URL = process.env.OPENAI_BASE_URL || undefined;
 
 let openai = null;
 if (PROVIDER === 'openai' && OPENAI_API_KEY) {
-  openai = new OpenAI({
-    apiKey: OPENAI_API_KEY,
-    baseURL: OPENAI_BASE_URL,
-  });
+  openai = new OpenAI({ apiKey: OPENAI_API_KEY, baseURL: OPENAI_BASE_URL });
 }
 
-/**
- * System prompt that shapes the AI into a helpful tourism guide.
- */
-const SYSTEM_PROMPT = `You are SmartGuide, an expert AI travel assistant for a smart tourism webapp.
+const SYSTEM_PROMPT = `You are SmartGuide, an expert AI travel assistant.
 Help users plan trips, discover destinations, and get local travel tips.
-Be friendly, concise, and practical. When suggesting itineraries, include:
-- Morning / afternoon / evening activities
-- Approximate durations
-- Estimated costs (budget / mid-range / luxury)
-- Food recommendations
-- Travel tips (best time to visit, local customs, transport)
-
-Always format itineraries clearly with bullet points and day headings.
-If the user asks for something unsafe, illegal, or harmful, decline politely.`;
+Be friendly, concise, practical. For itineraries include morning/afternoon/evening, durations, estimated costs, food, tips.
+Format with day headings and bullet points. Decline unsafe/illegal requests politely.`;
 
 /**
  * Generate a chat completion.
- * @param {Array} messages - Array of { role, content }
- * @param {Object} options - { temperature, maxTokens }
- * @returns {Promise<string>}
  */
 async function chatCompletion(messages, options = {}) {
   const { temperature = 0.7, maxTokens = 1000 } = options;
@@ -58,27 +38,51 @@ async function chatCompletion(messages, options = {}) {
       return completion.choices[0].message.content;
     } catch (err) {
       console.error('OpenAI error:', err.message);
-      // Fall back to mock on failure
       return mockCompletion(messages);
     }
   }
-
   return mockCompletion(messages);
 }
 
 /**
- * Mock AI that returns realistic travel responses without an API key.
- * Useful for demos, offline development, and testing.
+ * Mock AI fallback (no API key required).
  */
+const activityPool = {
+  morning: [
+    'Explore the historic old town on foot',
+    'Visit the main cathedral or temple',
+    'Take a guided walking tour of the city center',
+    'Watch the sunrise from a scenic viewpoint',
+    'Stroll through the local farmers market',
+    'Visit a traditional tea house or café',
+  ],
+  afternoon: [
+    'Visit the national museum',
+    'Lunch at a family-run local restaurant',
+    'Hike a nearby scenic trail',
+    'Take a river or harbor boat tour',
+    'Explore the art gallery district',
+    'Shop at the central bazaar or souk',
+  ],
+  evening: [
+    'Dinner at a rooftop restaurant with city views',
+    'Enjoy live traditional music',
+    'Night walk through the illuminated streets',
+    'Relax at a local pub or wine bar',
+    'Try street food at the night market',
+    'Attend a cultural performance or show',
+  ],
+};
+
+function randomPick(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
 function mockCompletion(messages) {
-  const lastUser = messages
-    .slice()
-    .reverse()
-    .find((m) => m.role === 'user');
+  const lastUser = [...messages].reverse().find((m) => m.role === 'user');
   const userText = (lastUser && lastUser.content) || '';
   const lower = userText.toLowerCase();
 
-  // Itinerary requests
   if (lower.includes('itinerary') || lower.includes('plan') || lower.includes('day')) {
     const daysMatch = userText.match(/(\d+)\s*-?\s*day/i);
     const days = daysMatch ? Math.min(Math.max(parseInt(daysMatch[1], 10), 1), 14) : 3;
@@ -86,89 +90,73 @@ function mockCompletion(messages) {
     return generateMockItinerary(destination, days);
   }
 
-  // Destination recommendations
-  if (
-    lower.includes('recommend') ||
-    lower.includes('suggest') ||
-    lower.includes('where should') ||
-    lower.includes('best place')
-  ) {
+  if (lower.includes('recommend') || lower.includes('suggest') || lower.includes('where should') || lower.includes('best place')) {
     return generateMockRecommendations(lower);
   }
 
-  // Packing
   if (lower.includes('pack') || lower.includes('packing')) {
-    return `🎒 Packing essentials for your trip:\n\n• Comfortable walking shoes\n• Weather-appropriate clothing (layers)\n• Travel adapter & power bank\n• Toiletries & medications\n• Copies of ID / passport / booking confirmations\n• Reusable water bottle\n• Daypack for excursions\n• Sunscreen & sunglasses\n\nPro tip: Roll your clothes to save space and check the local weather forecast before you pack.`;
+    return `🎒 Packing essentials for your trip:\n\n• Comfortable walking shoes\n• Weather-appropriate clothing (layers)\n• Travel adapter & power bank\n• Toiletries & medications\n• ID / passport / booking confirmations\n• Reusable water bottle\n• Small daypack\n• Sunscreen & sunglasses\n\n💡 Pro tip: Roll your clothes to save space, and check the forecast a day before you fly.`;
   }
 
-  // Budget / cost
-  if (lower.includes('budget') || lower.includes('cost') || lower.includes('expensive')) {
-    return `💰 Budgeting tips for travelers:\n\n• Travel in shoulder season for lower prices\n• Book accommodation and transport 4–8 weeks ahead\n• Eat where locals eat (street food & markets)\n• Use public transport or walk when possible\n• Set a daily spending limit and track expenses\n• Look for free walking tours and museum free-days\n\nWould you like a cost estimate for a specific destination?`;
+  if (lower.includes('budget') || lower.includes('cost')) {
+    return `💰 Smart budgeting tips:\n\n• Travel in shoulder season for lower prices\n• Book accommodation 4–8 weeks ahead\n• Eat where locals eat (markets, street food)\n• Use public transport or walk when possible\n• Set a daily spending limit and track it\n• Look for free walking tours and museum free-days\n\nWant a rough cost estimate for a specific city?`;
   }
 
-  // General / greeting
   if (lower.includes('hi') || lower.includes('hello') || lower.includes('hey')) {
-    return `Hello! I'm SmartGuide, your AI travel assistant. ✈️\n\nI can help you with:\n• Creating personalized day-by-day itineraries\n• Recommending destinations based on your interests\n• Answering questions about weather, food, and local customs\n• Packing and budgeting advice\n\nWhere would you like to go, or what would you like to plan?`;
+    const greetings = [
+      'Hello! I\'m SmartGuide ✈️ — your AI travel assistant.',
+      'Hi there! Ready to plan your next adventure?',
+      'Greetings! I\'m here to help you design the perfect trip.',
+    ];
+    return `${randomPick(greetings)}\n\nI can help you with:\n• Custom day-by-day itineraries\n• Destination recommendations\n• Packing and budgeting advice\n• Local tips and hidden gems\n\nWhere would you like to go?`;
   }
 
-  // Default helpful response
-  return `That's a great travel question! I'm here to help you plan your trip. Could you tell me a bit more about:
-
-1. Which destination(s) interest you?
-2. How many days will you be traveling?
-3. What do you enjoy most (culture, nature, food, adventure, relaxation)?
-4. Your rough budget level (budget / mid-range / luxury)?
-
-With those details, I can build you a personalized itinerary.`;
+  return `That's a great question! To give you the best advice, could you share:\n\n1. Your destination(s)\n2. How many days you'll travel\n3. Your interests (culture, food, nature, adventure, relaxation)\n4. Your budget level (budget / mid-range / luxury)\n\nWith those details, I'll build you a personalized plan.`;
 }
 
 function extractDestination(text) {
-  const known = [
-    'paris', 'tokyo', 'new york', 'london', 'bali', 'rome', 'bangkok',
-    'barcelona', 'sydney', 'dubai', 'istanbul', 'marrakech', 'kyoto',
-    'santorini', 'cape town', 'rio de janeiro', 'vancouver', 'berlin',
-  ];
+  const known = ['paris','tokyo','new york','london','bali','rome','bangkok','barcelona','sydney','dubai','istanbul','marrakech','kyoto','santorini','cape town','rio de janeiro','vancouver','berlin','amsterdam','prague','dubai','cairo','moscow','delhi','bangkok','seoul','singapore','hong kong','istanbul','moscow','rome','athens','lisbon','madrid','milan','venice','florence','vienna','budapest','stockholm','oslo','copenhagen','helsinki','reykjavik','dublin','edinburgh','brussels','zurich','geneva','bratislava','ljubljana','zagreb','sarajevo','skopje','sofia','bucharest','kyiv','minsk','riga','vilnius','tallinn','warsaw','prague','bratislava','ljubljana','zagreb'];
   const lower = text.toLowerCase();
-  for (const city of known) {
-    if (lower.includes(city)) return city.charAt(0).toUpperCase() + city.slice(1);
-  }
+  for (const city of known) if (lower.includes(city)) return city;
   return null;
 }
 
 function generateMockItinerary(destination, days) {
-  const morning = ['Visit the historic old town', 'Explore the local market', 'Take a guided walking tour', 'Watch the sunrise at the waterfront'];
-  const afternoon = ['Visit a famous museum', 'Lunch at a highly-rated local restaurant', 'Hike a scenic trail', 'Take a boat tour'];
-  const evening = ['Dinner at a rooftop restaurant', 'Enjoy live local music', 'Stroll through the illuminated city center', 'Relax at a local café'];
-
   let result = `🗓️ ${days}-Day Itinerary for ${destination}\n\n`;
-  result += `Here's a personalized plan for your trip to ${destination}. Adjust activities based on your pace and interests.\n\n`;
-
+  result += `Here's a personalized plan for your trip to ${destination}. Adjust based on your pace and interests.\n\n`;
   for (let d = 1; d <= days; d++) {
+    const m = randomPick(activityPool.morning);
+    const a = randomPick(activityPool.afternoon);
+    const e = randomPick(activityPool.evening);
+    const costs = ['Budget ($)', 'Mid-range ($$)', 'Luxury ($$$)'];
+    const cost = costs[Math.floor(Math.random() * costs.length)];
     result += `**Day ${d}**\n`;
-    result += `• Morning: ${morning[d % morning.length]}\n`;
-    result += `• Afternoon: ${afternoon[d % afternoon.length]}\n`;
-    result += `• Evening: ${evening[d % evening.length]}\n`;
-    result += `• Meal suggestion: Try a local specialty dish\n`;
-    result += `• Estimated cost: Mid-range ($$)\n\n`;
+    result += `• Morning: ${m}\n`;
+    result += `• Afternoon: ${a}\n`;
+    result += `• Evening: ${e}\n`;
+    result += `• Meal: Try a local specialty dish\n`;
+    result += `• Est. cost: ${cost}\n\n`;
   }
-
-  result += `💡 Tips:\n• Start early to avoid crowds at popular sites\n• Book tickets for top attractions in advance\n• Keep a copy of your reservation confirmations\n\nEnjoy your trip to ${destination}!`;
+  result += `💡 Tips for ${destination}:\n• Start early to beat crowds at top sights\n• Book popular attractions in advance\n• Keep digital and paper copies of reservations\n• Ask locals for their favorite spots\n\nEnjoy your trip to ${destination}!`;
   return result;
 }
 
 function generateMockRecommendations(lower) {
-  const recommendations = [
-    { name: 'Kyoto, Japan', why: 'Temples, cherry blossoms, and traditional tea houses — perfect for culture lovers.', budget: 'Mid-range' },
-    { name: 'Bali, Indonesia', why: 'Tropical beaches, rice terraces, and wellness retreats ideal for relaxation.', budget: 'Budget' },
-    { name: 'Barcelona, Spain', why: 'Stunning Gaudí architecture, tapas, and a vibrant Mediterranean lifestyle.', budget: 'Mid-range' },
-    { name: 'Queenstown, New Zealand', why: 'Adventure capital — bungee jumping, skiing, and breathtaking alpine scenery.', budget: 'Luxury' },
-    { name: 'Marrakech, Morocco', why: 'Colorful souks, historic palaces, and aromatic Moroccan cuisine.', budget: 'Budget' },
-    { name: 'Reykjavik, Iceland', why: 'Northern lights, geothermal pools, and dramatic volcanic landscapes.', budget: 'Luxury' },
+  const recs = [
+    { name: 'Kyoto, Japan', why: 'Temples, cherry blossoms, tea houses — perfect for culture lovers.', budget: 'Mid-range' },
+    { name: 'Bali, Indonesia', why: 'Tropical beaches, rice terraces, wellness retreats — ideal for relaxation.', budget: 'Budget' },
+    { name: 'Barcelona, Spain', why: 'Gaudí architecture, tapas, vibrant Mediterranean lifestyle.', budget: 'Mid-range' },
+    { name: 'Queenstown, New Zealand', why: 'Adventure capital — bungee, skiing, breathtaking alpine scenery.', budget: 'Luxury' },
+    { name: 'Marrakech, Morocco', why: 'Colorful souks, historic palaces, aromatic Moroccan cuisine.', budget: 'Budget' },
+    { name: 'Reykjavik, Iceland', why: 'Northern lights, geothermal pools, dramatic volcanic landscapes.', budget: 'Luxury' },
+    { name: 'Amsterdam, Netherlands', why: 'Canals, museums, cycling culture, and cozy cafés.', budget: 'Mid-range' },
+    { name: 'Cape Town, South Africa', why: 'Table Mountain, beaches, vineyards, and wildlife.', budget: 'Budget' },
   ];
-
   let result = '🌍 Destination Recommendations\n\n';
-  for (const rec of recommendations) {
-    result += `• ${rec.name} (${rec.budget})\n  ${rec.why}\n\n`;
+  // Shuffle for variety
+  const shuffled = [...recs].sort(() => Math.random() - 0.5);
+  for (const r of shuffled) {
+    result += `• ${r.name} (${r.budget})\n  ${r.why}\n\n`;
   }
   result += 'Tell me your interests and travel dates, and I can narrow this down further!';
   return result;

@@ -4,31 +4,12 @@ const API_URL = import.meta.env.VITE_API_URL || '/api';
 
 const api = axios.create({
   baseURL: API_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  headers: { 'Content-Type': 'application/json' },
 });
 
-// Attach JWT to every request
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-
-// Optional: attach user to requests
-api.interceptors.request.use((config) => {
-  const userStr = localStorage.getItem('user');
-  if (userStr) {
-    try {
-      const user = JSON.parse(userStr);
-      config.headers['X-User-Id'] = user._id || user.id;
-    } catch (_) {
-      // ignore malformed user data
-    }
-  }
+  if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 
@@ -49,6 +30,7 @@ export const destinationAPI = {
 export const tripAPI = {
   getMyTrips: () => api.get('/trips'),
   getById: (id) => api.get(`/trips/${id}`),
+  getByShare: (token) => api.get(`/trips/share/${token}`),
   create: (data) => api.post('/trips', data),
   update: (id, data) => api.put(`/trips/${id}`, data),
   delete: (id) => api.delete(`/trips/${id}`),
@@ -56,6 +38,19 @@ export const tripAPI = {
 
 export const aiAPI = {
   chat: (data) => api.post('/ai/chat', data),
+};
+
+export const userAPI = {
+  me: () => api.get('/users/me'),
+  toggleFavorite: (destinationId) => api.post(`/users/me/favorites/${destinationId}`),
+  getFavorites: () => api.get('/users/me/favorites'),
+};
+
+export const adminAPI = {
+  getStats: () => api.get('/admin/stats'),
+  getDestinations: (params) => api.get('/admin/destinations', { params }),
+  updateDestination: (id, data) => api.patch(`/admin/destinations/${id}`, data),
+  getUsers: () => api.get('/admin/users'),
 };
 
 export default api;
