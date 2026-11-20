@@ -13,7 +13,7 @@ export default function BookingLinks({ links }) {
   if (!hasLinks) return null;
 
   return (
-    <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 shadow-sm">
+    <div className="glass-card p-4">
       <p className="text-sm font-semibold text-slate-900 dark:text-white mb-3">Book your trip</p>
       <div className="space-y-2">
         {items.map((item) => {
@@ -24,7 +24,7 @@ export default function BookingLinks({ links }) {
               href={links[item.key]}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-between px-3 py-2 rounded-lg border border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+              className="flex items-center justify-between px-3 py-2 rounded-lg border border-white/60 dark:border-white/10 hover:bg-white/50 dark:hover:bg-white/10 transition-colors"
             >
               <div className="flex items-center gap-2">
                 {item.icon}

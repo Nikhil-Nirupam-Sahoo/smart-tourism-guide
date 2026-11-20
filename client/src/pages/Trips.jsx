@@ -134,7 +134,7 @@ export default function Trips() {
                   </div>
                 )}
               </div>
-              <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+              <div className="flex items-center justify-between pt-3 border-t border-white/50 dark:border-white/10">
                 <Link
                   to={`/trips/${trip._id}`}
                   className="text-sm font-medium text-sky-600 hover:underline flex items-center gap-1"

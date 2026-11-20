@@ -171,9 +171,9 @@ export default function ChatWidget({ open = false }) {
       : 'DEMO AI';
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 flex h-[70vh] max-h-[600px] w-[calc(100vw-2rem)] max-w-[380px] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-900 sm:bottom-6 sm:right-6">
+    <div className="fixed bottom-4 right-4 z-50 glass-card flex h-[70vh] max-h-[600px] w-[calc(100vw-2rem)] max-w-[380px] flex-col overflow-hidden shadow-2xl sm:bottom-6 sm:right-6">
       {/* Header */}
-      <div className="flex items-center justify-between bg-gradient-to-r from-sky-700 to-cyan-600 px-4 py-3 text-white">
+      <div className="flex items-center justify-between bg-gradient-to-r from-sky-700/90 to-cyan-600/90 px-4 py-3 text-white backdrop-blur-xl">
         <div className="flex items-center gap-2.5">
           <img src="/logo.svg" alt="" className="h-8 w-8 rounded-lg shadow-sm" />
           <div>
@@ -213,7 +213,7 @@ export default function ChatWidget({ open = false }) {
         ref={scrollRef}
         onScroll={handleScroll}
         aria-live="polite"
-        className="relative min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain bg-slate-50 p-4 text-sm leading-relaxed dark:bg-slate-950"
+        className="relative min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain bg-white/25 p-4 text-sm leading-relaxed dark:bg-slate-950/40"
       >
         {messages.map((msg) => (
           <div
@@ -221,7 +221,7 @@ export default function ChatWidget({ open = false }) {
             className={`max-w-[88%] break-words rounded-2xl px-3.5 py-2.5 shadow-sm ${
               msg.role === 'user'
                 ? 'ml-auto rounded-br-md bg-sky-600 text-white'
-                : 'mr-auto rounded-bl-md border border-slate-200 bg-white text-slate-800 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100'
+                : 'mr-auto rounded-bl-md glass-chip text-slate-800 dark:text-slate-100'
             }`}
           >
             <MessageBody content={msg.content} />
@@ -229,7 +229,7 @@ export default function ChatWidget({ open = false }) {
         ))}
 
         {sending && (
-          <div className="mr-auto flex items-center gap-2 rounded-2xl rounded-bl-md border border-slate-200 bg-white px-3.5 py-2.5 text-slate-700 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">
+          <div className="mr-auto flex items-center gap-2 rounded-2xl rounded-bl-md glass-chip px-3.5 py-2.5 text-slate-700 dark:text-slate-200">
             <Loader2 size={15} className="animate-spin text-sky-500" />
             <span className="text-xs">Thinking…</span>
           </div>
@@ -241,7 +241,7 @@ export default function ChatWidget({ open = false }) {
               atBottomRef.current = true;
               scrollToBottom();
             }}
-            className="sticky bottom-0 left-1/2 z-10 flex h-8 w-8 -translate-x-1/2 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-lg dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
+            className="sticky bottom-0 left-1/2 z-10 flex h-8 w-8 -translate-x-1/2 items-center justify-center rounded-full glass-chip text-slate-600 shadow-lg dark:text-slate-100"
             aria-label="Scroll to latest message"
           >
             <ArrowDown size={15} />
@@ -250,7 +250,7 @@ export default function ChatWidget({ open = false }) {
       </div>
 
       {/* Input */}
-      <div className="border-t border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-900">
+      <div className="border-t border-white/60 bg-white/40 p-3 backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/50">
         <form onSubmit={handleSend} className="relative">
           <textarea
             ref={inputRef}
@@ -260,7 +260,7 @@ export default function ChatWidget({ open = false }) {
             onKeyDown={handleKeyDown}
             placeholder="Ask about travel… (Enter to send)"
             aria-label="Message SmartGuide"
-            className="max-h-24 w-full resize-none rounded-xl border border-slate-200 bg-white py-2.5 pl-3 pr-11 text-sm text-slate-900 placeholder-slate-400 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
+            className="max-h-24 w-full resize-none glass-chip py-2.5 pl-3 pr-11 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/20 dark:text-slate-100"
           />
           <button
             type="submit"

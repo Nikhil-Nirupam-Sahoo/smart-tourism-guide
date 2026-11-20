@@ -118,7 +118,7 @@ export default function DestinationDetail() {
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           <div className="lg:col-span-3 space-y-8">
-            <div className="rounded-2xl border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 shadow-sm">
+            <div className="glass-card p-6">
               <h2 className="font-bold text-xl text-slate-900 dark:text-white mb-3 flex items-center gap-2">
                 <MapPin size={20} className="text-sky-500" /> About {destination.name}
               </h2>
@@ -134,7 +134,7 @@ export default function DestinationDetail() {
 
             <BookingLinks links={destination.bookingLinks} />
 
-            <div className="rounded-2xl border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 shadow-sm">
+            <div className="glass-card p-6">
               <h2 className="font-bold text-xl text-slate-900 dark:text-white mb-4 flex items-center gap-2">
                 <Sparkles size={20} className="text-cyan-400" /> Plan your trip
               </h2>
@@ -152,7 +152,7 @@ export default function DestinationDetail() {
               selectedDestination={destination}
               className="h-[400px]"
             />
-            <div className="rounded-2xl border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 shadow-sm">
+            <div className="glass-card p-4">
               <h3 className="font-bold text-slate-900 dark:text-white mb-3">Quick actions</h3>
               <div className="space-y-2">
                 <button
@@ -163,14 +163,14 @@ export default function DestinationDetail() {
                       navigator.clipboard?.writeText(window.location.href);
                     }
                   }}
-                  className="w-full text-left py-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm text-sky-600 dark:text-sky-400 hover:bg-sky-50 dark:hover:bg-sky-900/20 flex items-center gap-2 transition-colors"
+                  className="w-full text-left py-2.5 rounded-xl glass-chip text-sm text-sky-600 dark:text-sky-400 hover:bg-sky-50/80 dark:hover:bg-sky-900/30 flex items-center gap-2 transition-colors"
                 >
                   <Share2 size={16} /> Share destination
                 </button>
                 {!isAuthenticated && (
                   <Link
                     to="/login"
-                    className="w-full text-left py-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2 transition-colors"
+                    className="w-full text-left py-2.5 rounded-xl glass-chip text-sm text-slate-600 dark:text-slate-300 hover:bg-white/80 dark:hover:bg-white/10 flex items-center gap-2 transition-colors"
                   >
                     <Sparkles size={16} /> Sign in to plan trip
                   </Link>

@@ -25,7 +25,7 @@ export default function WeatherWidget({ weather }) {
   const Icon = iconMap[code] || <Cloud size={24} className="text-slate-400" />;
 
   return (
-    <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 shadow-sm">
+    <div className="glass-card p-4">
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm font-semibold text-slate-900 dark:text-white">Weather</p>

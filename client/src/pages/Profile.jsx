@@ -47,7 +47,7 @@ export default function Profile() {
 
   if (!isAuthenticated || authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
+      <div className="min-h-screen flex items-center justify-center px-4">
         <div className="text-center">
           <div className="h-8 w-32 rounded bg-slate-200 animate-pulse mx-auto mb-4" />
           <p className="text-sm text-slate-500">Loading profile...</p>
@@ -89,7 +89,7 @@ export default function Profile() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-t border-slate-100 pt-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-t border-white/50 dark:border-white/10 pt-6">
           <div>
             <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Member since</p>
             <p className="text-sm text-slate-600">
@@ -129,7 +129,7 @@ export default function Profile() {
                   className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                     interests.includes(interest)
                       ? 'bg-sky-50 text-sky-700 border border-sky-100'
-                      : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+                      : 'glass-chip text-slate-600 hover:bg-white/80 dark:hover:bg-slate-700/70'
                   }`}
                 >
                   {interest}
@@ -159,7 +159,7 @@ export default function Profile() {
                   className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
                     budgetLevel === level
                       ? 'bg-sky-50 text-sky-700 border border-sky-100'
-                      : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+                      : 'glass-chip text-slate-600 hover:bg-white/80 dark:hover:bg-slate-700/70'
                   }`}
                 >
                   {level.charAt(0).toUpperCase() + level.slice(1)}

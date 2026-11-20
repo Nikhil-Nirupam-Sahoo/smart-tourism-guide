@@ -121,7 +121,7 @@ export default function TripDetail() {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 shadow-sm">
+      <div className="glass-card p-6">
         <div className="flex items-start justify-between gap-4 mb-6">
           <div className="flex items-center gap-3 min-w-0">
             <img
@@ -165,7 +165,7 @@ export default function TripDetail() {
                 : '—',
             },
           ].map((item) => (
-            <div key={item.label} className="p-4 rounded-xl bg-slate-50 dark:bg-slate-700/30 border border-slate-100 dark:border-slate-700">
+            <div key={item.label} className="p-4 rounded-xl glass-chip">
               <p className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400 mb-1">{item.label}</p>
               <p className="text-lg font-bold text-slate-900 dark:text-white">{item.value}</p>
             </div>
@@ -179,8 +179,8 @@ export default function TripDetail() {
         {trip.itinerary && trip.itinerary.length > 0 ? (
           <div className="space-y-4">
             {trip.itinerary.map((day) => (
-              <div key={day.day} className="border border-slate-100 dark:border-slate-700 rounded-xl overflow-hidden">
-                <div className="bg-slate-50 dark:bg-slate-700/30 px-4 py-3 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
+              <div key={day.day} className="glass-chip overflow-hidden">
+                <div className="glass-chip !rounded-none !border-x-0 !border-t-0 px-4 py-3 flex items-center justify-between">
                   <span className="font-bold text-slate-900 dark:text-white">Day {day.day}</span>
                   {day.title && <span className="text-sm text-slate-500 dark:text-slate-400">{day.title}</span>}
                 </div>
@@ -201,7 +201,7 @@ export default function TripDetail() {
                     </div>
                   ))}
                   {day.notes && (
-                    <p className="pt-2 border-t border-slate-100 dark:border-slate-700 text-xs text-slate-500 dark:text-slate-400 italic">
+                    <p className="pt-2 border-t border-white/50 dark:border-white/10 text-xs text-slate-500 dark:text-slate-400 italic">
                       {day.notes}
                     </p>
                   )}
@@ -213,7 +213,7 @@ export default function TripDetail() {
             ))}
           </div>
         ) : (
-          <div className="text-center py-12 rounded-xl border border-dashed border-slate-200 dark:border-slate-700">
+          <div className="text-center py-12 rounded-xl border border-dashed border-white/60 dark:border-white/15 glass-chip">
             <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center mx-auto mb-4 text-slate-400">
               <Sparkles size={24} />
             </div>

@@ -8,38 +8,138 @@
   }
 
   body {
-    @apply bg-slate-50 text-slate-900 antialiased;
+    @apply text-slate-900 antialiased;
     font-family: 'Inter', system-ui, sans-serif;
+    /* Ambient colour fields give the glass surfaces something to refract. */
+    background-color: #f8fafc;
+    background-image:
+      radial-gradient(60rem 40rem at 8% -10%, rgba(56, 189, 248, 0.22), transparent 60%),
+      radial-gradient(50rem 38rem at 95% 8%, rgba(129, 140, 248, 0.18), transparent 60%),
+      radial-gradient(55rem 40rem at 50% 110%, rgba(34, 211, 238, 0.16), transparent 60%);
+    background-attachment: fixed;
   }
 
   h1, h2, h3, h4, h5, h6 {
     @apply font-semibold tracking-tight;
   }
+
+  :focus-visible {
+    outline: 2px solid rgba(14, 165, 233, 0.75);
+    outline-offset: 2px;
+  }
 }
 
 @layer components {
-  .glass {
-    @apply bg-white/80 backdrop-blur-md border border-white/20;
+  /* ---------- Liquid glass surfaces ---------- */
+  .glass,
+  .glass-card,
+  .card,
+  .glass-chip {
+    position: relative;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.5));
+    border: 1px solid rgba(255, 255, 255, 0.72);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.9),
+      0 12px 40px -14px rgba(15, 23, 42, 0.22);
+    backdrop-filter: blur(22px) saturate(180%);
+    -webkit-backdrop-filter: blur(22px) saturate(180%);
   }
 
+  /* A soft diagonal sheen, like light catching curved glass. */
+  .glass-card::before,
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(125deg, rgba(255, 255, 255, 0.35), transparent 42%);
+    pointer-events: none;
+  }
+
+  .glass,
+  .glass-card,
+  .card {
+    @apply rounded-2xl;
+  }
+
+  .card {
+    @apply overflow-hidden transition-all hover:shadow-xl;
+  }
+
+  .glass {
+    @apply rounded-none border-x-0 border-t-0;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+  }
+
+  .glass-chip {
+    @apply rounded-xl;
+    background: rgba(255, 255, 255, 0.6);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.75),
+      0 4px 16px -8px rgba(15, 23, 42, 0.2);
+    backdrop-filter: blur(14px) saturate(160%);
+    -webkit-backdrop-filter: blur(14px) saturate(160%);
+  }
+
+  .glass-hero {
+    background: linear-gradient(120deg, rgba(15, 23, 42, 0.82), rgba(2, 132, 199, 0.6));
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.25),
+      0 24px 60px -24px rgba(2, 132, 199, 0.65);
+    backdrop-filter: blur(16px) saturate(150%);
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+  }
+
+  /* ---------- Controls ---------- */
   .btn {
     @apply inline-flex items-center justify-center rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-200 disabled:opacity-50 disabled:pointer-events-none;
   }
 
   .btn-primary {
-    @apply btn bg-sky-500 text-white hover:bg-sky-600 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2;
+    @apply btn text-white;
+    background: linear-gradient(135deg, #0ea5e9, #06b6d4);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.45),
+      0 10px 24px -10px rgba(14, 165, 233, 0.75);
+  }
+  .btn-primary:hover:not(:disabled) {
+    transform: translateY(-1px);
+    background: linear-gradient(135deg, #0284c7, #0891b2);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.5),
+      0 14px 30px -10px rgba(14, 165, 233, 0.85);
   }
 
   .btn-outline {
-    @apply btn border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2;
+    @apply btn text-slate-700;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.9),
+      0 6px 20px -12px rgba(15, 23, 42, 0.35);
+    backdrop-filter: blur(14px) saturate(160%);
+    -webkit-backdrop-filter: blur(14px) saturate(160%);
+  }
+  .btn-outline:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.85);
+    transform: translateY(-1px);
   }
 
   .input {
-    @apply block w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-slate-900 placeholder-slate-400 transition-all focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent;
+    @apply block w-full rounded-xl px-4 py-2.5 text-slate-900 placeholder-slate-400 transition-all;
+    background: rgba(255, 255, 255, 0.62);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
-
-  .card {
-    @apply rounded-2xl border border-slate-100 bg-white overflow-hidden transition-all hover:shadow-xl;
+  .input:focus {
+    @apply outline-none;
+    border-color: rgba(14, 165, 233, 0.7);
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.18);
   }
 
   .badge {
@@ -47,11 +147,17 @@
   }
 
   .badge-outline {
-    @apply badge border border-slate-200 text-slate-600 bg-white;
+    @apply badge text-slate-600;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
   }
 
   .badge-fill {
-    @apply badge text-white bg-sky-600;
+    @apply badge text-white;
+    background: linear-gradient(135deg, #0ea5e9, #0284c7);
+    box-shadow: 0 6px 16px -8px rgba(14, 165, 233, 0.8);
   }
 }
 
@@ -61,69 +167,91 @@
   }
 }
 
-/* Dark mode overrides */
+/* ---------- Dark mode ---------- */
 .dark {
   color-scheme: dark;
 }
 
 .dark body {
-  @apply bg-slate-900 text-slate-100;
+  @apply text-slate-100;
+  background-color: #0f172a;
+  background-image:
+    radial-gradient(60rem 40rem at 8% -10%, rgba(14, 165, 233, 0.2), transparent 60%),
+    radial-gradient(50rem 38rem at 95% 8%, rgba(99, 102, 241, 0.18), transparent 60%),
+    radial-gradient(55rem 40rem at 50% 110%, rgba(6, 182, 212, 0.14), transparent 60%);
+}
+
+.dark .glass,
+.dark .glass-card,
+.dark .card,
+.dark .glass-chip {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.78), rgba(15, 23, 42, 0.68));
+  border-color: rgba(148, 163, 184, 0.2);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.09),
+    0 16px 45px -14px rgba(0, 0, 0, 0.65);
 }
 
 .dark .glass {
-  @apply bg-slate-800/80 border-slate-700/50;
+  background: rgba(15, 23, 42, 0.62);
+  border-color: rgba(148, 163, 184, 0.15);
 }
 
-.dark .card {
-  @apply border-slate-700 bg-slate-800;
+.dark .glass-card::before,
+.dark .card::before {
+  background: linear-gradient(125deg, rgba(255, 255, 255, 0.07), transparent 42%);
+}
+
+.dark .glass-chip {
+  background: rgba(30, 41, 59, 0.65);
 }
 
 .dark .input {
-  @apply border-slate-600 bg-slate-800 text-slate-100 placeholder-slate-400 focus:ring-sky-500;
+  background: rgba(15, 23, 42, 0.65);
+  border-color: rgba(148, 163, 184, 0.25);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  @apply text-slate-100 placeholder-slate-400;
+}
+.dark .input:focus {
+  border-color: rgba(56, 189, 248, 0.65);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.16);
+}
+
+.dark .btn-outline {
+  background: rgba(30, 41, 59, 0.7);
+  border-color: rgba(148, 163, 184, 0.25);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  @apply text-slate-200;
+}
+.dark .btn-outline:hover:not(:disabled) {
+  background: rgba(51, 65, 85, 0.8);
 }
 
 .dark .badge-outline {
-  @apply border-slate-600 text-slate-300 bg-slate-800;
+  background: rgba(30, 41, 59, 0.7);
+  border-color: rgba(148, 163, 184, 0.25);
+  @apply text-slate-300;
 }
+
+/* ---------- Contrast fixes ----------
+   Literal utility classes used across pages are normalised here so text
+   never stays dark on a dark glass surface (or bright on a bright chip). */
 
 .dark .text-slate-500 {
   color: #94a3b8; /* slate-400 without @apply (avoids Tailwind circular-dependency error) */
 }
-
-.dark .text-slate-600 {
-  @apply text-slate-300;
-}
-
-.dark .bg-slate-50 {
-  @apply bg-slate-900;
-}
-
-.dark .bg-white {
-  @apply bg-slate-800;
-}
-
-.dark .border-slate-100 {
-  @apply border-slate-700;
-}
-
-.dark .shadow-sm {
-  @apply shadow-none;
-}
-
-/* ---------- Contrast fixes ----------
-   Tailwind's dark: variants only work when written explicitly. These global
-   rules cover the literal utility classes used throughout the app so text
-   never stays dark on a dark surface (or bright on a bright chip). */
-
 .dark .text-slate-900 { @apply text-slate-100; }
 .dark .text-slate-800 { @apply text-slate-100; }
 .dark .text-slate-700 { @apply text-slate-200; }
+.dark .text-slate-600 { @apply text-slate-300; }
 .dark .text-slate-400 { color: #cbd5e1; }
 
+.dark .bg-slate-50 { @apply bg-slate-900; }
+.dark .bg-white { @apply bg-slate-800; }
 .dark .bg-slate-100 { @apply bg-slate-700; }
 .dark .bg-slate-200 { @apply bg-slate-700; }
+.dark .border-slate-100 { @apply border-slate-700; }
 
-/* Hover utilities are not covered by the literal-class rules above. */
 .dark .hover\:bg-slate-50:hover { @apply bg-slate-700; }
 .dark .hover\:bg-slate-100:hover { @apply bg-slate-700; }
 .dark .hover\:text-slate-900:hover { @apply text-white; }
@@ -131,12 +259,6 @@
 .dark .hover\:text-red-500:hover { @apply text-red-400; }
 .dark .hover\:text-sky-700:hover { @apply text-sky-300; }
 
-/* Outline buttons are @apply-inlined, so .dark .bg-white cannot reach them. */
-.dark .btn-outline {
-  @apply border-slate-600 text-slate-200 bg-slate-800 hover:bg-slate-700;
-}
-
-/* Accent colours: keep text readable and tone down bright chips in dark mode. */
 .dark .text-sky-600 { @apply text-sky-400; }
 .dark .text-sky-700 { @apply text-sky-300; }
 .dark .text-blue-600 { @apply text-blue-400; }

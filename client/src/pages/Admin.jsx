@@ -46,7 +46,7 @@ export default function Admin() {
 
   if (!isAdmin) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
+      <div className="min-h-screen flex items-center justify-center px-4">
         <div className="text-center">
           <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4 text-red-600">
             <Shield size={32} />
@@ -83,7 +83,7 @@ export default function Admin() {
 
       {/* Stats cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="rounded-2xl border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 shadow-sm">
+        <div className="glass-card p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Total Users</p>
@@ -94,7 +94,7 @@ export default function Admin() {
             </div>
           </div>
         </div>
-        <div className="rounded-2xl border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 shadow-sm">
+        <div className="glass-card p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Destinations</p>
@@ -105,7 +105,7 @@ export default function Admin() {
             </div>
           </div>
         </div>
-        <div className="rounded-2xl border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 shadow-sm">
+        <div className="glass-card p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Total Trips</p>
@@ -119,7 +119,7 @@ export default function Admin() {
       </div>
 
       {/* Manage destinations */}
-      <div className="rounded-2xl border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 shadow-sm">
+      <div className="glass-card p-6">
         <div className="flex items-center justify-between mb-6">
           <h2 className="font-bold text-slate-900 flex items-center gap-2">
             <Settings size={20} className="text-sky-500" />
@@ -129,7 +129,7 @@ export default function Admin() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm border-collapse">
             <thead>
-              <tr className="border-b border-slate-100 dark:border-slate-700">
+              <tr className="border-b border-white/50 dark:border-white/10">
                 <th className="pb-3 text-left text-xs font-bold uppercase tracking-wider text-slate-400">Name</th>
                 <th className="pb-3 text-left text-xs font-bold uppercase tracking-wider text-slate-400">Category</th>
                 <th className="pb-3 text-left text-xs font-bold uppercase tracking-wider text-slate-400">Rating</th>
@@ -139,7 +139,7 @@ export default function Admin() {
             </thead>
             <tbody>
               {destinations.map((d) => (
-                <tr key={d._id} className="border-b border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
+                <tr key={d._id} className="border-b border-white/50 dark:border-white/10 hover:bg-white/40 dark:hover:bg-white/10 transition-colors">
                   <td className="py-3 text-slate-700 dark:text-slate-300">{d.name}</td>
                   <td className="py-3 text-slate-700 dark:text-slate-300 capitalize">{d.category}</td>
                   <td className="py-3 text-slate-700 dark:text-slate-300">{d.rating?.toFixed(1) || '—'}</td>
@@ -170,12 +170,12 @@ export default function Admin() {
       </div>
 
       {/* Users */}
-      <div className="rounded-2xl border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 shadow-sm">
+      <div className="glass-card p-6">
         <h2 className="font-bold text-slate-900 mb-6">Recent Users</h2>
         <div className="overflow-x-auto">
           <table className="w-full text-sm border-collapse">
             <thead>
-              <tr className="border-b border-slate-100 dark:border-slate-700">
+              <tr className="border-b border-white/50 dark:border-white/10">
                 <th className="pb-3 text-left text-xs font-bold uppercase tracking-wider text-slate-400">Name</th>
                 <th className="pb-3 text-left text-xs font-bold uppercase tracking-wider text-slate-400">Email</th>
                 <th className="pb-3 text-left text-xs font-bold uppercase tracking-wider text-slate-400">Role</th>
@@ -183,7 +183,7 @@ export default function Admin() {
             </thead>
             <tbody>
               {users.map((u) => (
-                <tr key={u._id} className="border-b border-slate-100 dark:border-slate-700">
+                <tr key={u._id} className="border-b border-white/50 dark:border-white/10">
                   <td className="py-3 text-slate-700 dark:text-slate-300">{u.name}</td>
                   <td className="py-3 text-slate-700 dark:text-slate-300">{u.email}</td>
                   <td className="py-3">

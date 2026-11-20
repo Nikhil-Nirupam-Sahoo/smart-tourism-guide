@@ -56,7 +56,7 @@ export default function MapComponent({ destinations, selectedDestination, classN
   });
 
   return (
-    <div className={`rounded-2xl border border-slate-200 overflow-hidden ${className}`}>
+    <div className={`glass-card overflow-hidden ${className}`}>
       <div className="relative h-[400px]">
         <MapContainer
           center={center}
@@ -75,7 +75,7 @@ export default function MapComponent({ destinations, selectedDestination, classN
           )}
         </MapContainer>
         {/* Compass decoration */}
-        <div className="absolute top-4 left-4 z-10 flex items-center gap-2 bg-white/90 dark:bg-slate-800/90 px-3 py-1.5 rounded-lg shadow-sm border border-slate-100">
+        <div className="absolute top-4 left-4 z-10 flex items-center gap-2 glass-chip px-3 py-1.5 rounded-lg">
           <Compass size={16} className="text-sky-600" />
           <span className="text-xs font-semibold text-slate-700">Travel Map</span>
         </div>

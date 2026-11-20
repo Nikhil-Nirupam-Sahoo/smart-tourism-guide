@@ -16,7 +16,7 @@ export default function ShareButton({ trip }) {
     <div className="inline-flex items-center gap-2">
       <button
         onClick={copy}
-        className="p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+        className="p-2 rounded-xl glass-chip text-slate-600 dark:text-slate-300 hover:bg-white/80 dark:hover:bg-white/10 transition-colors"
         title="Copy share link"
       >
         {copied ? <Copy size={18} className="text-green-500" /> : <Share2 size={18} />}

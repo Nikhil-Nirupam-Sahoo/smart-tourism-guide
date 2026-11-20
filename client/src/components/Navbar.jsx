@@ -25,7 +25,7 @@ export default function Navbar() {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <nav className="sticky top-0 z-50 glass border-b border-slate-200/60 dark:border-slate-700/60">
+    <nav className="sticky top-0 z-50 glass border-b border-white/50 dark:border-white/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -58,7 +58,7 @@ export default function Navbar() {
             {isAuthenticated ? (
               <>
                 {user.role === 'admin' && (
-                  <Link to="/admin" className="flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+                  <Link to="/admin" className="flex items-center gap-2 px-3 py-2 rounded-xl glass-chip text-slate-600 dark:text-slate-300 text-sm font-medium hover:bg-white/80 dark:hover:bg-white/10 transition-colors">
                     <Shield size={16} /> Admin
                   </Link>
                 )}
@@ -96,7 +96,7 @@ export default function Navbar() {
 
         {/* Mobile menu */}
         {menuOpen && (
-          <div className="md:hidden mt-2 border-t border-slate-100 pt-4 space-y-2">
+          <div className="md:hidden mt-2 border-t border-white/50 dark:border-white/10 pt-4 space-y-2">
             <NavLink to="/" label="Home" icon={<Compass size={18} />} active={isActive('/')} mobile />
             <NavLink to="/destinations" label="Destinations" icon={<MapPin size={18} />} active={isActive('/destinations')} mobile />
             <NavLink to="/trips" label="My Trips" icon={<Plane size={18} />} active={isActive('/trips')} mobile />

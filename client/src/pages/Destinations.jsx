@@ -64,7 +64,7 @@ export default function Destinations() {
     history: 'bg-amber-50 text-amber-700 border-amber-100',
     beach: 'bg-cyan-50 text-cyan-700 border-cyan-100',
     mountain: 'bg-emerald-50 text-emerald-700 border-emerald-100',
-    city: 'bg-slate-50 text-slate-700 border-slate-100',
+    city: 'glass-chip text-slate-700',
   };
 
   return (
@@ -85,7 +85,7 @@ export default function Destinations() {
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               !filters.category
                 ? 'bg-sky-50 text-sky-700 border border-sky-100'
-                : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+                : 'glass-chip text-slate-600 hover:bg-white/80 dark:hover:bg-slate-700/70'
             }`}
           >
             All categories
@@ -97,7 +97,7 @@ export default function Destinations() {
               className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
                 filters.category === c
                   ? 'bg-sky-50 text-sky-700 border-sky-100'
-                  : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                  : 'glass-chip text-slate-600 hover:bg-white/80'
               }`}
             >
               {c.charAt(0).toUpperCase() + c.slice(1)}
@@ -144,7 +144,7 @@ export default function Destinations() {
             className={`p-2.5 rounded-lg text-sm font-medium border transition-colors ${
               viewMode === 'map'
                 ? 'bg-sky-50 text-sky-700 border-sky-100'
-                : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                : 'glass-chip text-slate-600 hover:bg-white/80'
             }`}
             title="Toggle map view"
           >
@@ -193,7 +193,7 @@ export default function Destinations() {
               <div
                 key={d._id}
                 onClick={() => setSelected(d)}
-                className="flex items-center gap-3 p-3 rounded-xl border border-slate-100 bg-white hover:bg-slate-50 cursor-pointer transition-colors"
+                className="glass-chip flex items-center gap-3 p-3 cursor-pointer transition-colors hover:bg-white/80 dark:hover:bg-slate-700/60"
               >
                 <img
                   src={d.image}

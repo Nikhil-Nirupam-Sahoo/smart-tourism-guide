@@ -21,7 +21,7 @@ export default function Home() {
   return (
     <div className="space-y-0">
       {/* Hero */}
-      <section className="relative overflow-hidden rounded-3xl bg-slate-900 text-white p-8 md:p-12 animate-fade-in">
+      <section className="relative overflow-hidden rounded-3xl glass-hero text-white p-8 md:p-12 animate-fade-in">
         <div className="absolute inset-0 -z-10 bg-[url('https://thumb.wikimedia.org/wikipedia/commons/thumb/6/68/Taj_Mahal%2C_Agra%2C_India.jpg/1280px-Taj_Mahal%2C_Agra%2C_India.jpg')] bg-cover bg-center opacity-40"></div>
         <div className="max-w-2xl">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 backdrop-blur text-xs font-semibold text-sky-200 mb-6">
@@ -39,7 +39,7 @@ export default function Home() {
             <Link to="/destinations" className="btn btn-primary px-8 py-3 text-base flex items-center justify-center gap-2">
               <Plane size={18} /> Explore Destinations
             </Link>
-            <Link to="/trips" className="btn btn-outline px-8 py-3 text-base flex items-center justify-center gap-2 bg-white text-slate-900 hover:bg-slate-100">
+            <Link to="/trips" className="btn btn-outline px-8 py-3 text-base flex items-center justify-center gap-2">
               <MapPin size={18} /> My Trips
             </Link>
           </div>
@@ -85,7 +85,7 @@ export default function Home() {
       </section>
 
       {/* How it works */}
-      <section className="bg-slate-50 py-16 border-y border-slate-100">
+      <section className="py-16 border-y border-white/50 dark:border-white/10 bg-white/25 dark:bg-slate-900/25 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-slate-900 text-center mb-12">How it works</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -106,7 +106,7 @@ export default function Home() {
                 desc: 'Save your trips, view them on a map, and chat with SmartGuide.',
               },
             ].map((step, i) => (
-              <div key={i} className="text-center p-6 rounded-2xl bg-white border border-slate-100">
+              <div key={i} className="text-center p-6 glass-card">
                 <div className="w-12 h-12 rounded-full bg-sky-50 flex items-center justify-center mx-auto mb-4 text-sky-600 font-bold">
                   {i + 1}
                 </div>
